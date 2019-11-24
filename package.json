@@ -1,5 +1,5 @@
 {
-	"name": "@wizard04wsu/tree-sitter-regex-unicode-js",
+	"name": "tree-sitter-regex-unicode-js",
 	"version": "0.0.0",
 	"description": "JavaScript regular expression grammar for Unicode patterns",
 	"main": "index.js",
