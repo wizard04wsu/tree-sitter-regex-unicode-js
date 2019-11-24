@@ -1,0 +1,21 @@
+{
+	"name": "tree-sitter-regex-unicode-js",
+	"version": "0.0.0",
+	"description": "JavaScript regular expression grammar for Unicode patterns",
+	"main": "index.js",
+	"repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
+	"keywords": [
+		"javascript",
+		"regex",
+		"unicode",
+		"parser"
+	],
+	"author": "Andy Harrison",
+	"license": "MIT",
+	"devDependencies": {
+		"tree-sitter-cli": "^0.15.14"
+	},
+	"dependencies": {
+		"nan": "^2.14.0"
+	}
+}
