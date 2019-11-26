@@ -127,9 +127,14 @@ module.exports = grammar({
 		
 		named_capturing_group: $ => seq(
 			$.group_begin,
-			alias(seq('?<', $.group_name, '>'), $.named_capturing_group_identifier),
+			$.named_capturing_group_identifier,
 			optional($.pattern),
 			$.group_end
+		),
+		named_capturing_group_identifier: $ => seq(
+			'?<',
+			$.group_name,
+			'>'
 		),
 		
 		// TODO: This seems to match what Chrome allows for group names, but make this match the spec.
