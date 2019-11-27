@@ -92,6 +92,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -171,6 +175,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -210,6 +218,10 @@
           "named": true
         },
         {
+          "type": "unicode_property_operator",
+          "named": true
+        },
+        {
           "type": "unicode_property_value",
           "named": true
         }
@@ -238,6 +250,10 @@
         },
         {
           "type": "identity_escape",
+          "named": true
+        },
+        {
+          "type": "non_syntax_characters",
           "named": true
         },
         {
@@ -283,15 +299,11 @@
       "required": true,
       "types": [
         {
-          "type": "count_quantifier_begin",
-          "named": true
-        },
-        {
           "type": "count_quantifier_delimiter",
           "named": true
         },
         {
-          "type": "count_quantifier_end",
+          "type": "count_quantifier_value",
           "named": true
         },
         {
@@ -387,6 +399,10 @@
         },
         {
           "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax_characters",
           "named": true
         },
         {
@@ -567,6 +583,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -691,6 +711,10 @@
         },
         {
           "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax_characters",
           "named": true
         },
         {
@@ -821,6 +845,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -856,11 +884,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
-      "required": false,
+      "multiple": false,
+      "required": true,
       "types": [
         {
-          "type": "unicode_escape",
+          "type": "group_name",
           "named": true
         }
       ]
@@ -960,6 +988,10 @@
         },
         {
           "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax_characters",
           "named": true
         },
         {
@@ -1090,6 +1122,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -1217,6 +1253,10 @@
           "named": true
         },
         {
+          "type": "non_syntax_characters",
+          "named": true
+        },
+        {
           "type": "null_character",
           "named": true
         },
@@ -1283,7 +1323,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "anonymous_capturing_group",
@@ -1359,6 +1399,10 @@
         },
         {
           "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax_characters",
           "named": true
         },
         {
@@ -1440,15 +1484,15 @@
     "named": false
   },
   {
-    "type": "=",
-    "named": false
-  },
-  {
     "type": ">",
     "named": false
   },
   {
     "type": "?",
+    "named": false
+  },
+  {
+    "type": "?<",
     "named": false
   },
   {
@@ -1492,15 +1536,11 @@
     "named": true
   },
   {
-    "type": "count_quantifier_begin",
-    "named": true
-  },
-  {
     "type": "count_quantifier_delimiter",
     "named": true
   },
   {
-    "type": "count_quantifier_end",
+    "type": "count_quantifier_value",
     "named": true
   },
   {
@@ -1552,6 +1592,10 @@
     "named": true
   },
   {
+    "type": "non_syntax_characters",
+    "named": true
+  },
+  {
     "type": "range_delimiter",
     "named": true
   },
@@ -1580,8 +1624,16 @@
     "named": true
   },
   {
+    "type": "unicode_property_operator",
+    "named": true
+  },
+  {
     "type": "unicode_property_value",
     "named": true
+  },
+  {
+    "type": "{",
+    "named": false
   },
   {
     "type": "}",

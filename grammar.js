@@ -57,7 +57,7 @@ module.exports = grammar({
 		disjunction_delimiter: $ => '|',
 		
 		unit: $ => choice(
-			$._pattern_character,						// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
+			$.non_syntax_characters,					// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 			$.any_character,							// .
 			$.start_assertion,							// ^
 			$.end_assertion,							// $
@@ -200,7 +200,7 @@ module.exports = grammar({
 		),
 		
 		set_atom: $ => choice(
-			$._set_character,
+			alias($._non_syntax_set_characters, $.non_syntax_characters),
 			$.character_escape,
 			alias('\\b', $.special_escape),
 			$.character_class_escape,
@@ -212,7 +212,8 @@ module.exports = grammar({
 			'-'
 		),
 		
-		_set_character: $ => /[^\\\]\-]/,	// NOT: \ ] -
+		//string of non-syntax characters in a character set
+		_non_syntax_set_characters: $ => /[^\\\]\-]+/,	// NOT: \ ] -
 			
 		
 		//#####  character class escapes  #####
@@ -295,7 +296,7 @@ module.exports = grammar({
 		
 		any_character: $ => '.',
 		
-		//non-syntax characters
-		_pattern_character: $ => /[^\^$\\.*+?()\[\]{}|\/\n]/	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
+		//string of non-syntax characters
+		non_syntax_characters: $ => /[^\^$\\.*+?()\[\]{}|\/\n]+/	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 	}
 })

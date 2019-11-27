@@ -76,7 +76,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_pattern_character"
+          "name": "non_syntax_characters"
         },
         {
           "type": "SYMBOL",
@@ -255,20 +255,20 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "{"
-              },
-              "named": true,
-              "value": "count_quantifier_begin"
+              "type": "STRING",
+              "value": "{"
             },
             {
               "type": "SEQ",
               "members": [
                 {
-                  "type": "PATTERN",
-                  "value": "[0-9]+"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[0-9]+"
+                  },
+                  "named": true,
+                  "value": "count_quantifier_value"
                 },
                 {
                   "type": "CHOICE",
@@ -289,8 +289,13 @@
                           "type": "CHOICE",
                           "members": [
                             {
-                              "type": "PATTERN",
-                              "value": "[0-9]+"
+                              "type": "ALIAS",
+                              "content": {
+                                "type": "PATTERN",
+                                "value": "[0-9]+"
+                              },
+                              "named": true,
+                              "value": "count_quantifier_value"
                             },
                             {
                               "type": "BLANK"
@@ -307,13 +312,8 @@
               ]
             },
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "}"
-              },
-              "named": true,
-              "value": "count_quantifier_end"
+              "type": "STRING",
+              "value": "}"
             }
           ]
         },
@@ -515,26 +515,8 @@
           "name": "group_begin"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "?<"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "group_name"
-              },
-              {
-                "type": "STRING",
-                "value": ">"
-              }
-            ]
-          },
-          "named": true,
-          "value": "named_capturing_group_identifier"
+          "type": "SYMBOL",
+          "name": "named_capturing_group_identifier"
         },
         {
           "type": "CHOICE",
@@ -551,6 +533,23 @@
         {
           "type": "SYMBOL",
           "name": "group_end"
+        }
+      ]
+    },
+    "named_capturing_group_identifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "?<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "group_name"
+        },
+        {
+          "type": "STRING",
+          "value": ">"
         }
       ]
     },
@@ -783,8 +782,13 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_set_character"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_non_syntax_set_characters"
+          },
+          "named": true,
+          "value": "non_syntax_characters"
         },
         {
           "type": "SYMBOL",
@@ -827,9 +831,9 @@
         }
       ]
     },
-    "_set_character": {
+    "_non_syntax_set_characters": {
       "type": "PATTERN",
-      "value": "[^\\\\\\]\\-]"
+      "value": "[^\\\\\\]\\-]+"
     },
     "character_class_escape": {
       "type": "CHOICE",
@@ -876,8 +880,13 @@
                   "value": "unicode_property_name"
                 },
                 {
-                  "type": "STRING",
-                  "value": "="
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "="
+                  },
+                  "named": true,
+                  "value": "unicode_property_operator"
                 }
               ]
             },
@@ -1052,9 +1061,9 @@
       "type": "STRING",
       "value": "."
     },
-    "_pattern_character": {
+    "non_syntax_characters": {
       "type": "PATTERN",
-      "value": "[^\\^$\\\\.*+?()\\[\\]{}|\\/\\n]"
+      "value": "[^\\^$\\\\.*+?()\\[\\]{}|\\/\\n]+"
     }
   },
   "extras": [],
