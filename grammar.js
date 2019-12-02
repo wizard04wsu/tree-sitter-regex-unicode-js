@@ -30,13 +30,15 @@ module.exports = grammar({
 	conflicts: $ => [
 		[ $.unicode_escape, $._escape_operator ],
 		[ $.hexadecimal_escape, $._escape_operator ],
-		[ $.control_letter_escape, $._escape_operator ]
+		[ $.control_letter_escape, $._escape_operator ],
 	],
 	
 	inline: $ => [
 		$.pattern,
 		$.unit,
 		$.quantifier,
+		$._invalid_quantifier,
+		$._invalid_secondary_quantifier,
 		$.set_unit,
 		$.set_atom,
 		$.character_escape,
@@ -54,7 +56,13 @@ module.exports = grammar({
 		pattern: $ => seq(
 			repeat1(seq(
 				$.unit,
-				optional($.quantifier),
+				optional(choice(
+					seq(
+						$.quantifier,
+						optional($._invalid_secondary_quantifier),
+					),
+					$._invalid_quantifier,
+				)),
 			)),
 			optional($.disjunction),
 		),
@@ -76,7 +84,7 @@ module.exports = grammar({
 			$._invalid_character_escape,
 			$.character_class_escape,					// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
 			$._invalid_character_class_escape,
-			$.backreference,						// \1 ... \9 \1__ ... \9__ \k<__>
+			$.backreference,							// \1 ... \9 \1__ ... \9__ \k<__>
 			alias($.character_set, $.character_class),	// [__] [^__]
 			$.anonymous_capturing_group,				// (__)
 			$.non_capturing_group,						// (?:__)
@@ -96,6 +104,15 @@ module.exports = grammar({
 			$.one_or_more,		// + +?
 			$.optional,			// ? ??
 			$.count_quantifier,	// {__} {__,} {__,__} {__}? {__,}? {__,__}?
+		),
+		_invalid_quantifier: $ => choice(
+			/\{,/,
+			/\{[0-9]*[^0-9,}]/,
+			/\{[0-9]+,[0-9]*[^0-9}]/,
+		),
+		_invalid_secondary_quantifier: $ => choice(
+			/[?*+]/,
+			/\{[0-9]+(,[0-9]*)?\}/,
 		),
 		
 		

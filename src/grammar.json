@@ -21,8 +21,34 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "quantifier"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "quantifier"
+                          },
+                          {
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "_invalid_secondary_quantifier"
+                              },
+                              {
+                                "type": "BLANK"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_invalid_quantifier"
+                      }
+                    ]
                   },
                   {
                     "type": "BLANK"
@@ -175,6 +201,36 @@
         {
           "type": "SYMBOL",
           "name": "count_quantifier"
+        }
+      ]
+    },
+    "_invalid_quantifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\{,"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\{[0-9]*[^0-9,}]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\{[0-9]+,[0-9]*[^0-9}]"
+        }
+      ]
+    },
+    "_invalid_secondary_quantifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[?*+]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\{[0-9]+(,[0-9]*)?\\}"
         }
       ]
     },
@@ -1236,6 +1292,7 @@
     "pattern",
     "unit",
     "quantifier",
+    "_invalid_quantifier",
     "set_unit",
     "set_atom",
     "character_escape",
