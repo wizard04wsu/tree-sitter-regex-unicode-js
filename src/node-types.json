@@ -16,7 +16,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -92,7 +92,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -127,7 +127,7 @@
     }
   },
   {
-    "type": "backreference_escape",
+    "type": "backreference",
     "named": true,
     "fields": {},
     "children": {
@@ -175,7 +175,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -237,10 +237,6 @@
       "required": true,
       "types": [
         {
-          "type": "character_class_escape",
-          "named": true
-        },
-        {
           "type": "control_letter_escape",
           "named": true
         },
@@ -253,7 +249,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -330,7 +326,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -402,7 +398,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -435,11 +431,6 @@
         }
       ]
     }
-  },
-  {
-    "type": "escape_operator",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "group_name",
@@ -503,7 +494,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -583,7 +574,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -634,7 +625,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -714,7 +705,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -765,7 +756,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -845,7 +836,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -911,7 +902,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -991,7 +982,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -1042,7 +1033,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -1122,7 +1113,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -1173,7 +1164,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -1253,7 +1244,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -1323,7 +1314,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "anonymous_capturing_group",
@@ -1334,7 +1325,7 @@
           "named": true
         },
         {
-          "type": "backreference_escape",
+          "type": "backreference",
           "named": true
         },
         {
@@ -1402,7 +1393,7 @@
           "named": true
         },
         {
-          "type": "non_syntax_characters",
+          "type": "non_syntax_character",
           "named": true
         },
         {
@@ -1484,6 +1475,10 @@
     "named": false
   },
   {
+    "type": "=",
+    "named": false
+  },
+  {
     "type": ">",
     "named": false
   },
@@ -1513,10 +1508,6 @@
   },
   {
     "type": "\\u",
-    "named": false
-  },
-  {
-    "type": "\\u{",
     "named": false
   },
   {
@@ -1592,7 +1583,7 @@
     "named": true
   },
   {
-    "type": "non_syntax_characters",
+    "type": "non_syntax_character",
     "named": true
   },
   {
