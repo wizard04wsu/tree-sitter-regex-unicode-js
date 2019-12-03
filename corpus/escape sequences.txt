@@ -1,0 +1,120 @@
+==============================
+Special escapes
+==============================
+\f\n\r\t\v
+---------------
+(regex
+	(special_escape)
+	(special_escape)
+	(special_escape)
+	(special_escape)
+	(special_escape))
+
+==============================
+Control letter escapes
+==============================
+\ca[\ca]
+---------------
+(regex
+	(control_letter_escape
+		(control_letter_code))
+	(character_class
+		(set_begin)
+		(control_letter_escape
+			(control_letter_code))
+		(set_end)))
+
+==============================
+Hexadecimal escapes
+==============================
+\xff[\xff]
+---------------
+(regex
+	(hexadecimal_escape
+		(hexadecimal_code))
+	(character_class
+		(set_begin)
+		(hexadecimal_escape
+			(hexadecimal_code))
+		(set_end)))
+
+==============================
+Unicode escapes
+==============================
+\uffff[\uffff]\u{f}[\u{f}]\u{fffff}[\u{fffff}]\u{10ffff}[\u{10ffff}]
+---------------
+(regex
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end)))
+
+==============================
+Null escape
+==============================
+\0
+---------------
+(regex
+	(null_character))
+
+==============================
+Identity escapes
+==============================
+\^\$\\\.\*\+\?\(\)\[\]\{\}\|\/
+---------------
+(regex
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator)))
+
