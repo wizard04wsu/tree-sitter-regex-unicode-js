@@ -307,6 +307,7 @@ module.exports = grammar({
 					),
 				),
 			),
+			//optional('{'),
 		),
 		
 		hexadecimal_escape: $ => seq(
@@ -317,7 +318,7 @@ module.exports = grammar({
 			'\\x',
 			///[a-fA-F0-9]{0,1}/	<--- this causes a very bad memory leak in Atom; TODO: submit bug report
 			///[a-fA-F0-9]?/	<--- this causes a very bad memory leak in Atom; TODO: submit bug report
-			optional(/[a-fA-F0-9]/),
+			//optional(/[a-fA-F0-9]/),
 		),
 		//_invalid_hexadecimal_escape: $ => /\\x[a-fA-F0-9]?/,	<--- this causes a memory leak when running `tree-sitter generate`; TODO: submit bug report
 		
@@ -326,7 +327,7 @@ module.exports = grammar({
 			alias(/[a-zA-Z]/, $.control_letter_code),
 		),
 		/*_invalid_control_letter_escape: $ => seq(
-			'\\c',
+			'\\c',	//TODO: find a way for this to work
 		),*/
 		
 		special_escape: $ => /\\[fnrtv]/,

@@ -1201,18 +1201,6 @@
         {
           "type": "STRING",
           "value": "\\x"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[a-fA-F0-9]"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         }
       ]
     },
