@@ -1293,6 +1293,7 @@
     "unit",
     "quantifier",
     "_invalid_quantifier",
+    "_invalid_secondary_quantifier",
     "set_unit",
     "set_atom",
     "character_escape",

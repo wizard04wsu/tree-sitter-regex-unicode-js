@@ -275,7 +275,6 @@ module.exports = grammar({
 		_invalid_character_escape: $ => choice(
 			$._invalid_unicode_escape,
 			$._invalid_hexadecimal_escape,
-			//$._invalid_control_letter_escape,
 		),
 		
 		//escapes that remove any special meaning of a character
