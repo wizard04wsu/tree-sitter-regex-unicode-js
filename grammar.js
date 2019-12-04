@@ -160,16 +160,18 @@ module.exports = grammar({
 			'>',
 		),
 		
-		// TODO: This seems to match what Chrome allows for group names, but make this match the spec.
+		//TODO: Tree-sitter doesn't support Unicode property escapes, so this isn't to spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
 		group_name: $ => seq(
 			choice(
+				///[\p{ID_Start}$_]/,
 				/[a-zA-Z0-9_$]/,
 				$.unicode_escape,
 			),
 			repeat(
 				choice(
+					///[\p{ID_Continue}$_\u200C\u200D]/,
 					/[a-zA-Z0-9_$\u200C\u200D]/,
 					$.unicode_escape,
 				),
