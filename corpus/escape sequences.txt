@@ -1,0 +1,221 @@
+==============================
+Special escapes
+==============================
+\f\n\r\t\v\0[\f\n\r\t\v\0\b]
+---------------
+(regex
+	(special_escape)
+	(special_escape)
+	(special_escape)
+	(special_escape)
+	(special_escape)
+	(null_character)
+	(character_class
+		(set_begin)
+		(special_escape)
+		(special_escape)
+		(special_escape)
+		(special_escape)
+		(special_escape)
+		(null_character)
+		(special_escape)
+		(set_end)))
+
+==============================
+Control letter escapes
+==============================
+\ca[\ca]
+---------------
+(regex
+	(control_letter_escape
+		(control_letter_code))
+	(character_class
+		(set_begin)
+		(control_letter_escape
+			(control_letter_code))
+		(set_end)))
+
+==============================
+Hexadecimal escapes
+==============================
+\xff[\xff]
+---------------
+(regex
+	(hexadecimal_escape
+		(hexadecimal_code))
+	(character_class
+		(set_begin)
+		(hexadecimal_escape
+			(hexadecimal_code))
+		(set_end)))
+
+==============================
+Unicode escapes
+==============================
+\uffff[\uffff]\u{f}[\u{f}]\u{fffff}[\u{fffff}]\u{10ffff}[\u{10ffff}]
+---------------
+(regex
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end))
+	(unicode_escape
+		(unicode_code))
+	(character_class
+		(set_begin)
+		(unicode_escape
+			(unicode_code))
+		(set_end)))
+
+==============================
+Identity escapes
+==============================
+\^\$\\\.\*\+\?\(\)\[\]\{\}\|\/
+---------------
+(regex
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator))
+	(identity_escape
+		(escape_operator)))
+
+==============================
+Identity escapes in set
+==============================
+[\^\$\\\.\*\+\?\(\)\[\]\{\}\|\/\-]
+---------------
+(regex
+	(character_class
+		(set_begin)
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(identity_escape
+			(escape_operator))
+		(set_end)))
+
+==============================
+Character class escapes
+==============================
+\d\D\s\S\w\W[\d\D\s\S\w\W]
+---------------
+(regex
+	(character_class_escape)
+	(character_class_escape)
+	(character_class_escape)
+	(character_class_escape)
+	(character_class_escape)
+	(character_class_escape)
+	(character_class
+		(set_begin)
+		(character_class_escape)
+		(character_class_escape)
+		(character_class_escape)
+		(character_class_escape)
+		(character_class_escape)
+		(character_class_escape)
+		(set_end)))
+
+==============================
+Unicode property escapes
+==============================
+\p{a}\P{a}\p{a=b}\P{a=b}[\p{a}\P{a}\p{a=b}\P{a=b}]
+---------------
+(regex
+	(character_class_escape
+		(unicode_property_value))
+	(character_class_escape
+		(unicode_property_value))
+	(character_class_escape
+		(unicode_property_name)
+		(unicode_property_operator)
+		(unicode_property_value))
+	(character_class_escape
+		(unicode_property_name)
+		(unicode_property_operator)
+		(unicode_property_value))
+	(character_class
+		(set_begin)
+		(character_class_escape
+			(unicode_property_value))
+		(character_class_escape
+			(unicode_property_value))
+		(character_class_escape
+			(unicode_property_name)
+			(unicode_property_operator)
+			(unicode_property_value))
+		(character_class_escape
+			(unicode_property_name)
+			(unicode_property_operator)
+			(unicode_property_value))
+		(set_end)))
+

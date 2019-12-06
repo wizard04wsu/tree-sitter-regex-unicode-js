@@ -1,0 +1,88 @@
+==============================
+Quantifiers - wildcards
+==============================
+a? a* a+
+---------------
+(regex
+	(non_syntax_character)
+	(optional)
+	(non_syntax_character)
+	(non_syntax_character)
+	(zero_or_more)
+	(non_syntax_character)
+	(non_syntax_character)
+	(one_or_more))
+
+==============================
+Quantifiers - lazy wildcards
+==============================
+a?? a*? a+?
+---------------
+(regex
+	(non_syntax_character)
+	(optional
+		(lazy))
+	(non_syntax_character)
+	(non_syntax_character)
+	(zero_or_more
+		(lazy))
+	(non_syntax_character)
+	(non_syntax_character)
+	(one_or_more
+		(lazy)))
+
+==============================
+Quantifiers - counts
+==============================
+a{1} a{1,} a{1,2}
+---------------
+(regex
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value))
+	(non_syntax_character)
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value)
+		(count_quantifier_delimiter))
+	(non_syntax_character)
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value)
+		(count_quantifier_delimiter)
+		(count_quantifier_value)))
+
+==============================
+Quantifiers - lazy counts
+==============================
+a{1}? a{1,}? a{1,2}?
+---------------
+(regex
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value)
+		(lazy))
+	(non_syntax_character)
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value)
+		(count_quantifier_delimiter)
+		(lazy))
+	(non_syntax_character)
+	(non_syntax_character)
+	(count_quantifier
+		(count_quantifier_value)
+		(count_quantifier_delimiter)
+		(count_quantifier_value)
+		(lazy)))
+
+==============================
+Quantifiers - question mark identity escape
+==============================
+\?*
+---------------
+(regex
+	(identity_escape
+		(escape_operator))
+	(zero_or_more))
+

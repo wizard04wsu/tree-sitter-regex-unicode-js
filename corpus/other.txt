@@ -1,0 +1,113 @@
+==============================
+Dot
+==============================
+.
+---------------
+(regex
+	(any_character))
+
+==============================
+Character sets
+==============================
+[a][^a][a^][a-z][a-\d]
+---------------
+(regex
+	(character_class
+		(set_begin)
+		(non_syntax_character)
+		(set_end))
+	(character_class
+		(set_begin)
+		(set_negation)
+		(non_syntax_character)
+		(set_end))
+	(character_class
+		(set_begin)
+		(non_syntax_character)
+		(non_syntax_character)
+		(set_end))
+	(character_class
+		(set_begin)
+		(character_range
+			(non_syntax_character)
+			(range_delimiter)
+			(non_syntax_character))
+		(set_end))
+	(character_class
+		(set_begin)
+		(non_syntax_character)
+		(non_syntax_character)
+		(character_class_escape)
+		(set_end)))
+
+==============================
+Groups and lookarounds
+==============================
+(a(A))(?<b>c)(?:d)(?=e)(?!f)(?<=g)(?<!h)
+---------------
+(regex
+	(anonymous_capturing_group
+		(group_begin)
+		(non_syntax_character)
+		(anonymous_capturing_group
+			(group_begin)
+			(non_syntax_character)
+			(group_end))
+		(group_end))
+	(named_capturing_group
+		(group_begin)
+		(named_capturing_group_identifier
+			(group_name))
+		(non_syntax_character)
+		(group_end))
+	(non_capturing_group
+		(group_begin)
+		(non_capturing_group_identifier)
+		(non_syntax_character)
+		(group_end))
+	(lookahead_assertion
+		(group_begin)
+		(lookahead_identifier)
+		(non_syntax_character)
+		(group_end))
+	(negative_lookahead_assertion
+		(group_begin)
+		(negative_lookahead_identifier)
+		(non_syntax_character)
+		(group_end))
+	(lookbehind_assertion
+		(group_begin)
+		(lookbehind_identifier)
+		(non_syntax_character)
+		(group_end))
+	(negative_lookbehind_assertion
+		(group_begin)
+		(negative_lookbehind_identifier)
+		(non_syntax_character)
+		(group_end)))
+
+==============================
+Backreferences
+==============================
+\1\9\10\999\k<a>
+---------------
+(regex
+	(backreference)
+	(backreference)
+	(backreference)
+	(backreference)
+	(backreference
+		(group_name)))
+
+==============================
+Disjunction
+==============================
+a|b||
+---------------
+(regex
+	(non_syntax_character)
+	(disjunction_delimiter)
+	(non_syntax_character)
+	(disjunction_delimiter)
+	(disjunction_delimiter))
+

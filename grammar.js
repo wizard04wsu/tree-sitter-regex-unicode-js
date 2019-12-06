@@ -6,7 +6,10 @@ const quantifierRule = prefix => $ => seq(
 const groupRule = identifier => $ => seq(
 	$.group_begin,
 	identifier($),
-	optional($.pattern),
+	optional(choice(
+		$.pattern,
+		$.disjunction,
+	)),
 	$.group_end,
 )
 
@@ -35,6 +38,7 @@ module.exports = grammar({
 	
 	inline: $ => [
 		$.pattern,
+		$.disjunction,
 		$.unit,
 		$.quantifier,
 		$._invalid_quantifier,
@@ -42,34 +46,39 @@ module.exports = grammar({
 		$.set_unit,
 		$.set_atom,
 		$.character_escape,
-		$.unicode_property_expression,
-		$._invalid_character_class_escape,
-		$._invalid_character_escape,
-		$._invalid_unicode_escape,
-		$._invalid_hexadecimal_escape,
-		//$._invalid_control_letter_escape,
+		$._invalid__character_class_escape,
+		$._invalid_set__character_class_escape,
+		$._invalid__hexadecimal_escape,
+		$._invalid_set__hexadecimal_escape,
+		$._invalid__unicode_escape,
+		$._invalid_set__unicode_escape,
 	],
 	
 	rules: {
-		regex: $ => $.pattern,
-		
-		pattern: $ => seq(
-			repeat1(seq(
-				$.unit,
-				optional(choice(
-					seq(
-						$.quantifier,
-						optional($._invalid_secondary_quantifier),
-					),
-					$._invalid_quantifier,
-				)),
-			)),
-			optional($.disjunction),
+		regex: $ => choice(
+			$.pattern,
+			$.disjunction,
 		),
 		
+		pattern: $ => repeat1(seq(
+			$.unit,
+			optional(choice(
+				seq(
+					$.quantifier,
+					optional($._invalid_secondary_quantifier),
+				),
+				$._invalid_quantifier,
+			)),
+		)),
+		
 		disjunction: $ => seq(
-			$.disjunction_delimiter,
 			optional($.pattern),
+			repeat1(
+				seq(
+					$.disjunction_delimiter,
+					optional($.pattern),
+				),
+			),
 		),
 		disjunction_delimiter: $ => '|',
 		
@@ -81,9 +90,8 @@ module.exports = grammar({
 			$.boundary_assertion,						// \b
 			$.non_boundary_assertion,					// \B
 			$.character_escape,							// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
-			$._invalid_character_escape,
 			$.character_class_escape,					// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
-			$._invalid_character_class_escape,
+			$._invalid__character_class_escape,
 			$.backreference,							// \1 ... \9 \1__ ... \9__ \k<__>
 			alias($.character_set, $.character_class),	// [__] [^__]
 			$.anonymous_capturing_group,				// (__)
@@ -160,17 +168,19 @@ module.exports = grammar({
 			'>',
 		),
 		
-		// TODO: This seems to match what Chrome allows for group names, but make this match the spec.
+		//TODO: Tree-sitter doesn't support Unicode property escapes, so I can't reasonably make this match the spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
 		group_name: $ => seq(
 			choice(
-				/[a-zA-Z0-9_$]/,
+				///[\p{ID_Start}$_]/,
+				/[a-zA-Z0-9$_]/,
 				$.unicode_escape,
 			),
 			repeat(
 				choice(
-					/[a-zA-Z0-9_$\u200C\u200D]/,
+					///[\p{ID_Continue}$_\u200C\u200D]/,
+					/[a-zA-Z0-9$_]/,
 					$.unicode_escape,
 				),
 			),
@@ -209,10 +219,13 @@ module.exports = grammar({
 		),
 		
 		set_unit: $ => choice(
-			$.set_atom,
-			$.character_class_escape,							// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
-			$._invalid_character_class_escape,
-			$._invalid_character_escape,
+			prec(1, choice(
+				$.set_atom,
+				$.character_class_escape,							// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
+			)),
+			$._invalid_set__hexadecimal_escape,
+			$._invalid_set__unicode_escape,
+			$._invalid_set__character_class_escape,
 		),
 		
 		set_atom: $ => choice(
@@ -234,47 +247,73 @@ module.exports = grammar({
 		character_class_escape: $ => choice(
 			/\\[dDsSwW]/,
 			seq(
-				/\\[pP]\{/,
-				$.unicode_property_expression,
+				/\\[pP]/,
+				'{',
+				choice(
+					alias($._unicode_property, $.unicode_property_value),
+					seq(
+						alias($._unicode_property, $.unicode_property_name),
+						alias('=', $.unicode_property_operator),
+						alias($._unicode_property, $.unicode_property_value),
+					),
+				),
 				'}',
 			),
 		),
-		unicode_property_expression: $ => seq(
-			optional(seq(
-				alias($._unicode_property, $.unicode_property_name),
-				alias('=', $.unicode_property_operator),
-			)),
-			alias($._unicode_property, $.unicode_property_value),
-		),
 		_unicode_property: $ => /[a-zA-Z_0-9]+/,
-		_invalid_character_class_escape: $ => seq(
-			/\\[pP]\{/,
-			seq(
-				optional(seq(
+		_invalid__character_class_escape: $ =>seq(
+			/\\[pP]/,
+			'{',
+			optional(choice(
+				seq(
 					$._unicode_property,
-					'='
-				)),
+					'=',
+					$._unicode_property,
+				),
+				seq(
+					$._unicode_property,
+					'=',
+				),
 				$._unicode_property,
-			),
+				'}',
+			)),
 		),
+		_invalid_set__character_class_escape: $ => seq(
+			/\\[pP]/,
+			'{',
+			optional(choice(
+				seq(
+					$._unicode_property,
+					'=',
+					$._unicode_property,
+				),
+				seq(
+					$._unicode_property,
+					'=',
+				),
+				$._unicode_property,
+				'}',
+			)),
+		),
+
 		
 		
 		//#####  character escapes  #####
 		
 		
 		character_escape: $ => choice(
-			prec(1, choice(
+			prec(2, choice(
 				$.special_escape,
 				$.control_letter_escape,
 				$.hexadecimal_escape,
 				$.unicode_escape,
 				$.null_character,
 			)),
+			prec(1, choice(
+				$._invalid__hexadecimal_escape,
+				$._invalid__unicode_escape,
+			)),
 			$.identity_escape,
-		),
-		_invalid_character_escape: $ => choice(
-			$._invalid_unicode_escape,
-			$._invalid_hexadecimal_escape,
 		),
 		
 		//escapes that remove any special meaning of a character
@@ -283,52 +322,63 @@ module.exports = grammar({
 			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
 		
-		unicode_escape: $ => seq(
-			'\\u',
-			choice(
+		unicode_escape: $ => choice(
+			seq(
+				'\\u',
 				alias(/[a-fA-F0-9]{4}/, $.unicode_code),
-				seq(
-					'{',
-					alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
+			),
+			seq(
+				'\\u{',
+				alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
+				'}',
+			),
+		),
+		_invalid__unicode_escape: $ => choice(
+			seq(
+				'\\u',
+				/[a-fA-F0-9]{0,3}/,
+			),
+			seq(
+				'\\u{',
+				choice(
+					/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
+					/0+/,
 					'}',
 				),
 			),
 		),
-		_invalid_unicode_escape: $ => seq(
-			'\\u',
-			choice(
+		_invalid_set__unicode_escape: $ => choice(
+			seq(
+				'\\u',
 				/[a-fA-F0-9]{0,3}/,
-				seq(
-					'{',
-					choice(
-						/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
-						/0*[a-fA-F0-9]{0,4}/,
-						'}',
-					),
+			),
+			seq(
+				'\\u{',
+				choice(
+					/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
+					/0+/,
+					'}',
 				),
 			),
-			//optional('{'),
 		),
 		
 		hexadecimal_escape: $ => seq(
 			'\\x',
 			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
 		),
-		_invalid_hexadecimal_escape: $ => seq(
+		_invalid__hexadecimal_escape: $ => seq(
 			'\\x',
-			///[a-fA-F0-9]{0,1}/	<--- this causes a very bad memory leak in Atom; TODO: submit bug report
-			///[a-fA-F0-9]?/	<--- this causes a very bad memory leak in Atom; TODO: submit bug report
-			//optional(/[a-fA-F0-9]/),
+			optional(/[a-fA-F0-9]/),
 		),
-		//_invalid_hexadecimal_escape: $ => /\\x[a-fA-F0-9]?/,	<--- this causes a memory leak when running `tree-sitter generate`; TODO: submit bug report
+		_invalid_set__hexadecimal_escape: $ => seq(
+			'\\x',
+			/[a-fA-F0-9]/,
+		),
 		
 		control_letter_escape: $ => seq(
 			'\\c',
 			alias(/[a-zA-Z]/, $.control_letter_code),
 		),
-		/*_invalid_control_letter_escape: $ => seq(
-			'\\c',	//TODO: find a way for this to work
-		),*/
 		
 		special_escape: $ => /\\[fnrtv]/,
 		
