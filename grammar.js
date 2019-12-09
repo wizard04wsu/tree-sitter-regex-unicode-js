@@ -31,6 +31,7 @@ module.exports = grammar({
 	extras: $ => [],
 	
 	conflicts: $ => [
+		[ $.group_name ],
 		[ $.unicode_escape, $._escape_operator ],
 		[ $.hexadecimal_escape, $._escape_operator ],
 		[ $.control_letter_escape, $._escape_operator ],
@@ -41,17 +42,26 @@ module.exports = grammar({
 		$.disjunction,
 		$.unit,
 		$.quantifier,
-		$._invalid_quantifier,
-		$._invalid_secondary_quantifier,
-		$.set_unit,
+		$._invalid__quantifier,
+		$._invalid__secondary_quantifier,
+		$._invalid__backreference,
+		$._invalid__group_name,
+		$._invalid__group_name_part,
+		$.set_range_atom,
 		$.set_atom,
-		$.character_escape,
 		$._invalid__character_class_escape,
-		$._invalid_set__character_class_escape,
-		$._invalid__hexadecimal_escape,
-		$._invalid_set__hexadecimal_escape,
+		$._invalid__in_set__character_class_escape,
+		$.character_escape,
+		$._invalid__character_escape,
+		$._invalid__in_set__character_escape,
+		$._invalid__identity_escape,
+		$._unicode_escape,
 		$._invalid__unicode_escape,
-		$._invalid_set__unicode_escape,
+		$._invalid__in_set__unicode_escape,
+		$._invalid__hexadecimal_escape,
+		$._invalid__in_set__hexadecimal_escape,
+		$._invalid__control_letter_escape,
+		$._invalid__in_set__control_letter_escape,
 	],
 	
 	rules: {
@@ -65,9 +75,9 @@ module.exports = grammar({
 			optional(choice(
 				seq(
 					$.quantifier,
-					optional($._invalid_secondary_quantifier),
+					optional($._invalid__secondary_quantifier),
 				),
-				$._invalid_quantifier,
+				$._invalid__quantifier,
 			)),
 		)),
 		
@@ -90,9 +100,13 @@ module.exports = grammar({
 			$.boundary_assertion,						// \b
 			$.non_boundary_assertion,					// \B
 			$.character_escape,							// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
+			$._invalid__character_escape,
+			$.identity_escape,
+			$._invalid__identity_escape,
 			$.character_class_escape,					// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
 			$._invalid__character_class_escape,
 			$.backreference,							// \1 ... \9 \1__ ... \9__ \k<__>
+			$._invalid__backreference,
 			alias($.character_set, $.character_class),	// [__] [^__]
 			$.anonymous_capturing_group,				// (__)
 			$.non_capturing_group,						// (?:__)
@@ -107,20 +121,22 @@ module.exports = grammar({
 		//#####  quantifiers  #####
 		
 		
-		quantifier: $ => choice(
+		quantifier: $ => prec(1, choice(
 			$.zero_or_more,		// * *?
 			$.one_or_more,		// + +?
 			$.optional,			// ? ??
 			$.count_quantifier,	// {__} {__,} {__,__} {__}? {__,}? {__,__}?
-		),
-		_invalid_quantifier: $ => choice(
+		)),
+		_invalid__quantifier: $ => choice(
+			/\{\}/,
 			/\{,/,
 			/\{[0-9]*[^0-9,}]/,
 			/\{[0-9]+,[0-9]*[^0-9}]/,
 		),
-		_invalid_secondary_quantifier: $ => choice(
-			/[?*+]/,
-			/\{[0-9]+(,[0-9]*)?\}/,
+		_invalid__secondary_quantifier: $ => choice(
+			/[?*+{]/,
+			///\{[0-9]+\}/,
+			///\{[0-9]+,[0-9]*\}/,
 		),
 		
 		
@@ -152,16 +168,41 @@ module.exports = grammar({
 		//#####  backreferences  #####
 		
 		
-		backreference: $ => choice(
-			seq('\\', /[1-9][0-9]*/),
-			seq('\\k<', $.group_name, '>'),
+		backreference: $ => prec(1, choice(
+			seq(
+				'\\',
+				/[1-9][0-9]*/
+			),
+			seq(
+				'\\k<',
+				$.group_name,
+				'>',
+			),
+		)),
+		_invalid__backreference: $ => choice(
+			'\\k<>',
+			seq(
+				'\\k<',
+				optional(
+					///[\p{ID_Start}$_]/,
+					/[a-zA-Z0-9_$]/,
+				),
+				$._invalid__group_name_part,
+			),
 		),
 		
 		
 		//#####  groups  #####
 		
 		
-		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
+		named_capturing_group: groupRule($ => choice(
+			$.named_capturing_group_identifier,
+			seq(
+				'?<',
+				optional($._invalid__group_name),
+				'>',
+			),
+		)),
 		named_capturing_group_identifier: $ => seq(
 			'?<',
 			$.group_name,
@@ -171,10 +212,10 @@ module.exports = grammar({
 		//TODO: Tree-sitter doesn't support Unicode property escapes, so I can't reasonably make this match the spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
-		group_name: $ => seq(
+		group_name: $ => prec(1, seq(
 			choice(
 				///[\p{ID_Start}$_]/,
-				/[a-zA-Z0-9$_]/,
+				/[a-zA-Z0-9_$]/,
 				$.unicode_escape,
 			),
 			repeat(
@@ -184,6 +225,27 @@ module.exports = grammar({
 					$.unicode_escape,
 				),
 			),
+		)),
+		_invalid__group_name: $ => seq(
+			optional(
+				///[\p{ID_Start}$_]/,
+				/[a-zA-Z0-9_$]/,
+			),
+			repeat1($._invalid__group_name_part),
+			repeat(choice(
+				///[\p{ID_Continue}$_\u200C\u200D]/,
+				/[a-zA-Z0-9$_]/,
+				$._unicode_escape,
+			)),
+		),
+		_invalid__group_name_part: $ => seq(
+			repeat(choice(
+				///[\p{ID_Continue}$_\u200C\u200D]/,
+				/[a-zA-Z0-9$_]/,
+				$._unicode_escape,
+			)),
+			///[^\p{ID_Continue}$_\u200C\u200D>]/,
+			/[^a-zA-Z0-9$_>]/,
 		),
 		
 		non_capturing_group: groupRule($ => alias('?:', $.non_capturing_group_identifier)),
@@ -204,7 +266,7 @@ module.exports = grammar({
 				prec.right(choice(
 					alias($.set_range, $.character_range),
 					seq(
-						$.set_unit,
+						$.set_atom,
 						optional(alias('-', $.non_syntax_character)),	//otherwise, a hyphen at the end of the character set would be an error (e.g., `[a-]`) - TODO: why is it an error???
 					),
 				)),
@@ -213,26 +275,35 @@ module.exports = grammar({
 		),
 		
 		set_range: $ => seq(
-			$.set_atom,
+			$.set_range_atom,
 			alias('-', $.range_delimiter),
-			$.set_atom,
+			$.set_range_atom,
 		),
 		
-		set_unit: $ => choice(
+		set_range_atom: $ => choice(
 			prec(1, choice(
-				$.set_atom,
-				$.character_class_escape,							// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
+				alias(/[^\\\]]/, $.non_syntax_character),		// NOT: \ ]
+				$.character_escape,	
+				alias('\\b', $.special_escape),
+				$._invalid__in_set__character_escape,
 			)),
-			$._invalid_set__hexadecimal_escape,
-			$._invalid_set__unicode_escape,
-			$._invalid_set__character_class_escape,
+			$.identity_escape,
+			alias($.set_identity_escape, $.identity_escape),	// \-
+			$._invalid__identity_escape,
 		),
 		
 		set_atom: $ => choice(
-			alias(/[^\\\]]/, $.non_syntax_character),			// NOT: \ ]
-			$.character_escape,									// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
-			alias('\\b', $.special_escape),						// \b
-			alias($.set_identity_escape, $.identity_escape),		// \-
+			prec(1, choice(
+				alias(/[^\\\]]/, $.non_syntax_character),		// NOT: \ ]
+				$.character_escape,
+				alias('\\b', $.special_escape),
+				$._invalid__in_set__character_escape,
+				$.character_class_escape,
+				$._invalid__in_set__character_class_escape,
+			)),
+			$.identity_escape,
+			alias($.set_identity_escape, $.identity_escape),	// \-
+			$._invalid__identity_escape,
 		),
 		
 		set_identity_escape: $ => seq(
@@ -244,56 +315,74 @@ module.exports = grammar({
 		//#####  character class escapes  #####
 		
 		
-		character_class_escape: $ => choice(
+		character_class_escape: $ => prec(1, choice(
 			/\\[dDsSwW]/,
 			seq(
-				/\\[pP]/,
-				'{',
+				/\\[pP]\{/,
 				choice(
-					alias($._unicode_property, $.unicode_property_value),
+					alias(/[a-zA-Z_0-9]+/, $.unicode_property_value),
 					seq(
-						alias($._unicode_property, $.unicode_property_name),
+						alias(/[a-zA-Z_0-9]+/, $.unicode_property_name),
 						alias('=', $.unicode_property_operator),
-						alias($._unicode_property, $.unicode_property_value),
+						alias(/[a-zA-Z_0-9]+/, $.unicode_property_value),
 					),
 				),
 				'}',
 			),
-		),
-		_unicode_property: $ => /[a-zA-Z_0-9]+/,
-		_invalid__character_class_escape: $ =>seq(
-			/\\[pP]/,
-			'{',
-			optional(choice(
-				seq(
-					$._unicode_property,
-					'=',
-					$._unicode_property,
-				),
-				seq(
-					$._unicode_property,
-					'=',
-				),
-				$._unicode_property,
+		)),
+		_invalid__character_class_escape: $ => choice(
+			seq(
+				/\\[pP]/,
+				optional(/[^\\\[(){|]/),
+			),
+			seq(
+				/\\[pP]\{/,
 				'}',
-			)),
+			),
+			seq(
+				/\\[pP]\{/,
+				optional(choice(
+					/[a-zA-Z_0-9]+/,
+					seq(
+						/[a-zA-Z_0-9]+/,
+						'=',
+					),
+					seq(
+						/[a-zA-Z_0-9]+/,
+						'=',
+						/[a-zA-Z_0-9]+/,
+					),
+				)),
+				optional(/[^a-zA-Z_0-9\\\[(){|}]/),
+			),
 		),
-		_invalid_set__character_class_escape: $ => seq(
-			/\\[pP]/,
-			'{',
-			optional(choice(
-				seq(
-					$._unicode_property,
-					'=',
-					$._unicode_property,
-				),
-				seq(
-					$._unicode_property,
-					'=',
-				),
-				$._unicode_property,
+		_invalid__in_set__character_class_escape: $ => choice(
+			seq(
+				/\\[pP]/,
+				optional(/[^\\\]]/),
+			),
+			seq(
+				/\\[pP]\{/,
 				'}',
-			)),
+			),
+			seq(
+				/\\[pP]\{/,
+				optional(choice(
+					seq(
+						/[a-zA-Z_0-9]+/,
+					),
+					seq(
+						/[a-zA-Z_0-9]+/,
+						'=',
+					),
+					seq(
+						/[a-zA-Z_0-9]+/,
+						'=',
+						/[a-zA-Z_0-9]+/,
+					),
+				)),
+				/[^a-zA-Z_0-9\\\]}]/,
+			),
 		),
 
 		
@@ -301,28 +390,37 @@ module.exports = grammar({
 		//#####  character escapes  #####
 		
 		
-		character_escape: $ => choice(
-			prec(2, choice(
-				$.special_escape,
-				$.control_letter_escape,
-				$.hexadecimal_escape,
-				$.unicode_escape,
-				$.null_character,
-			)),
-			prec(1, choice(
-				$._invalid__hexadecimal_escape,
-				$._invalid__unicode_escape,
-			)),
-			$.identity_escape,
+		character_escape: $ => prec(1, choice(
+			$.special_escape,
+			$.control_letter_escape,
+			$.hexadecimal_escape,
+			$.unicode_escape,
+			$.null_character,
+		)),
+		_invalid__character_escape: $ => choice(
+			$._invalid__null_character,
+			$._invalid__control_letter_escape,
+			$._invalid__hexadecimal_escape,
+			$._invalid__unicode_escape,
+		),
+		_invalid__in_set__character_escape: $ => choice(
+			$._invalid__null_character,
+			$._invalid__in_set__control_letter_escape,
+			$._invalid__in_set__hexadecimal_escape,
+			$._invalid__in_set__unicode_escape,
 		),
 		
 		//escapes that remove any special meaning of a character
-		identity_escape: $ => seq(
+		identity_escape: $ => prec(1, seq(
 			alias($._escape_operator, $.escape_operator),
 			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
+		)),
+		_invalid__identity_escape: $ => seq(
+			'\\',
+			/[^\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
 		
-		unicode_escape: $ => choice(
+		unicode_escape: $ => prec(1, choice(
 			seq(
 				'\\u',
 				alias(/[a-fA-F0-9]{4}/, $.unicode_code),
@@ -332,53 +430,86 @@ module.exports = grammar({
 				alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
 				'}',
 			),
+		)),
+		_unicode_escape: $ => choice(
+			seq(
+				'\\u',
+				/[a-fA-F0-9]{4}/,
+			),
+			seq(
+				'\\u{',
+				/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
+				'}',
+			),
 		),
 		_invalid__unicode_escape: $ => choice(
 			seq(
 				'\\u',
-				/[a-fA-F0-9]{0,3}/,
+				optional(/[a-fA-F0-9]{1,3}/),
+				optional(/[^a-fA-F0-9\\\[(){|]/),
 			),
 			seq(
 				'\\u{',
-				choice(
-					/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
-					/0+/,
-					'}',
-				),
+				'}',
+			),
+			seq(
+				'\\u{',
+				/0*[a-fA-F0-9]{0,4}[^a-fA-F0-9\\\[(){|}]/,
+			),
+			seq(
+				'\\u{',
+				/0*(?:[a-fA-F0-9]{5}|10[a-fA-F0-9]{4})[^\\\[(){|}]?/,
 			),
 		),
-		_invalid_set__unicode_escape: $ => choice(
+		_invalid__in_set__unicode_escape: $ => choice(
 			seq(
 				'\\u',
-				/[a-fA-F0-9]{0,3}/,
+				optional(/[a-fA-F0-9]{1,3}/),
+				/[^a-fA-F0-9\\\]]/,
 			),
 			seq(
 				'\\u{',
-				choice(
-					/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/,
-					/0+/,
-					'}',
-				),
+				'}',
+			),
+			seq(
+				'\\u{',
+				/0*[a-fA-F0-9]{0,4}[^a-fA-F0-9\\\]}]/,
+			),
+			seq(
+				'\\u{',
+				/0*(?:[a-fA-F0-9]{5}|10[a-fA-F0-9]{4})[^\\\]}]?/,
 			),
 		),
 		
-		hexadecimal_escape: $ => seq(
+		hexadecimal_escape: $ => prec(1, seq(
 			'\\x',
 			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
-		),
+		)),
 		_invalid__hexadecimal_escape: $ => seq(
 			'\\x',
 			optional(/[a-fA-F0-9]/),
+			optional(/[^a-fA-F0-9\\\[(){|]/),
 		),
-		_invalid_set__hexadecimal_escape: $ => seq(
+		_invalid__in_set__hexadecimal_escape: $ => seq(
 			'\\x',
-			/[a-fA-F0-9]/,
+			optional(/[a-fA-F0-9]/),
+			/[^a-fA-F0-9\\\]]/,
 		),
 		
-		control_letter_escape: $ => seq(
+		control_letter_escape: $ => prec(1, seq(
 			'\\c',
 			alias(/[a-zA-Z]/, $.control_letter_code),
+		)),
+		_invalid__control_letter_escape: $ => seq(
+			'\\c',
+			optional(/[^a-zA-Z\\\[(){|]/),
 		),
+		_invalid__in_set__control_letter_escape: $ => seq(
+			'\\c',
+			/[^a-zA-Z\\\]]/,
+		),
+		
+		_invalid__null_character: $ => /\\0[0-9]/,
 		
 		special_escape: $ => /\\[fnrtv]/,
 		

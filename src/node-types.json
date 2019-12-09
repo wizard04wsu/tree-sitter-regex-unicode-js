@@ -1384,6 +1384,10 @@
     "named": false
   },
   {
+    "type": "\\k<>",
+    "named": false
+  },
+  {
     "type": "\\u",
     "named": false
   },
