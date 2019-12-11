@@ -1305,6 +1305,11 @@
     }
   },
   {
+    "type": "special_escape",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "start_assertion",
     "named": true,
     "fields": {}
@@ -1485,10 +1490,6 @@
   },
   {
     "type": "set_negation",
-    "named": true
-  },
-  {
-    "type": "special_escape",
     "named": true
   },
   {

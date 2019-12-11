@@ -1,7 +1,7 @@
 const quantifierRule = prefix => $ => seq(
 	prefix($),
 	optional(alias('?', $.lazy)),
-)
+);
 
 const groupRule = identifier => $ => seq(
 	$.group_begin,
@@ -11,15 +11,7 @@ const groupRule = identifier => $ => seq(
 		$.disjunction,
 	)),
 	$.group_end,
-)
-
-const SYNTAX_CHARS = [
-	...'^$\\.*+?()[]{}|'
-]
-
-const SYNTAX_CHARS_ESCAPED = SYNTAX_CHARS.map(
-	char => `\\${char}`
-).join('')
+);
 
 module.exports = grammar({
 	name: 'regex',
@@ -43,7 +35,6 @@ module.exports = grammar({
 		$.unit,
 		$.quantifier,
 		$._invalid__quantifier,
-		$._invalid__secondary_quantifier,
 		$._invalid__backreference,
 		$._invalid__group_name,
 		$._invalid__group_name_part,
@@ -94,6 +85,7 @@ module.exports = grammar({
 		
 		unit: $ => choice(
 			$.non_syntax_character,						// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
+			$._syntax_character,
 			$.any_character,							// .
 			$.start_assertion,							// ^
 			$.end_assertion,							// $
@@ -121,23 +113,19 @@ module.exports = grammar({
 		//#####  quantifiers  #####
 		
 		
-		quantifier: $ => prec(1, choice(
+		quantifier: $ => choice(
 			$.zero_or_more,		// * *?
 			$.one_or_more,		// + +?
 			$.optional,			// ? ??
 			$.count_quantifier,	// {__} {__,} {__,__} {__}? {__,}? {__,__}?
-		)),
+		),
 		_invalid__quantifier: $ => choice(
 			/\{\}/,
 			/\{,/,
 			/\{[0-9]*[^0-9,}]/,
 			/\{[0-9]+,[0-9]*[^0-9}]/,
 		),
-		_invalid__secondary_quantifier: $ => choice(
-			/[?*+{]/,
-			///\{[0-9]+\}/,
-			///\{[0-9]+,[0-9]*\}/,
-		),
+		_invalid__secondary_quantifier: $ => /[?*+{]/,
 		
 		
 		zero_or_more: quantifierRule($ => '*'),
@@ -168,7 +156,7 @@ module.exports = grammar({
 		//#####  backreferences  #####
 		
 		
-		backreference: $ => prec(1, choice(
+		backreference: $ => choice(
 			seq(
 				'\\',
 				/[1-9][0-9]*/
@@ -178,17 +166,14 @@ module.exports = grammar({
 				$.group_name,
 				'>',
 			),
-		)),
+		),
 		_invalid__backreference: $ => choice(
 			'\\k<>',
-			seq(
+			prec.right(seq(
 				'\\k<',
-				optional(
-					///[\p{ID_Start}$_]/,
-					/[a-zA-Z0-9_$]/,
-				),
-				$._invalid__group_name_part,
-			),
+				$._invalid__group_name,
+				optional('>'),
+			)),
 		),
 		
 		
@@ -212,7 +197,7 @@ module.exports = grammar({
 		//TODO: Tree-sitter doesn't support Unicode property escapes, so I can't reasonably make this match the spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
-		group_name: $ => prec(1, seq(
+		group_name: $ => seq(
 			choice(
 				///[\p{ID_Start}$_]/,
 				/[a-zA-Z0-9_$]/,
@@ -225,7 +210,7 @@ module.exports = grammar({
 					$.unicode_escape,
 				),
 			),
-		)),
+		),
 		_invalid__group_name: $ => seq(
 			optional(
 				///[\p{ID_Start}$_]/,
@@ -244,8 +229,12 @@ module.exports = grammar({
 				/[a-zA-Z0-9$_]/,
 				$._unicode_escape,
 			)),
-			///[^\p{ID_Continue}$_\u200C\u200D>]/,
-			/[^a-zA-Z0-9$_>]/,
+			choice(
+				///[^\p{ID_Continue}$_\u200C\u200D>]/,
+				/[^a-zA-Z0-9$_>]/,
+				/\\[fnrtv]/,
+				$._invalid__character_escape,
+			),
 		),
 		
 		non_capturing_group: groupRule($ => alias('?:', $.non_capturing_group_identifier)),
@@ -306,16 +295,11 @@ module.exports = grammar({
 			$._invalid__identity_escape,
 		),
 		
-		set_identity_escape: $ => seq(
-			alias($._escape_operator, $.escape_operator),
-			'-',
-		),
-			
 		
 		//#####  character class escapes  #####
 		
 		
-		character_class_escape: $ => prec(1, choice(
+		character_class_escape: $ => choice(
 			/\\[dDsSwW]/,
 			seq(
 				/\\[pP]\{/,
@@ -329,7 +313,7 @@ module.exports = grammar({
 				),
 				'}',
 			),
-		)),
+		),
 		_invalid__character_class_escape: $ => choice(
 			seq(
 				/\\[pP]/,
@@ -390,13 +374,13 @@ module.exports = grammar({
 		//#####  character escapes  #####
 		
 		
-		character_escape: $ => prec(1, choice(
+		character_escape: $ => choice(
+			$.null_character,
 			$.special_escape,
 			$.control_letter_escape,
 			$.hexadecimal_escape,
 			$.unicode_escape,
-			$.null_character,
-		)),
+		),
 		_invalid__character_escape: $ => choice(
 			$._invalid__null_character,
 			$._invalid__control_letter_escape,
@@ -411,15 +395,19 @@ module.exports = grammar({
 		),
 		
 		//escapes that remove any special meaning of a character
-		identity_escape: $ => prec(1, seq(
+		identity_escape: $ => seq(
 			alias($._escape_operator, $.escape_operator),
 			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
-		)),
+		),
 		_invalid__identity_escape: $ => seq(
 			'\\',
 			/[^\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
-		
+		set_identity_escape: $ => seq(
+			alias($._escape_operator, $.escape_operator),
+			'-',
+		),
+			
 		unicode_escape: $ => prec(1, choice(
 			seq(
 				'\\u',
@@ -481,10 +469,10 @@ module.exports = grammar({
 			),
 		),
 		
-		hexadecimal_escape: $ => prec(1, seq(
+		hexadecimal_escape: $ => seq(
 			'\\x',
 			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
-		)),
+		),
 		_invalid__hexadecimal_escape: $ => seq(
 			'\\x',
 			optional(/[a-fA-F0-9]/),
@@ -496,10 +484,10 @@ module.exports = grammar({
 			/[^a-fA-F0-9\\\]]/,
 		),
 		
-		control_letter_escape: $ => prec(1, seq(
+		control_letter_escape: $ => seq(
 			'\\c',
 			alias(/[a-zA-Z]/, $.control_letter_code),
-		)),
+		),
 		_invalid__control_letter_escape: $ => seq(
 			'\\c',
 			optional(/[^a-zA-Z\\\[(){|]/),
@@ -532,5 +520,7 @@ module.exports = grammar({
 		
 		//string of non-syntax characters
 		non_syntax_character: $ => /[^\^$\\.*+?()\[\]{}|\/\n]/,	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
+		
+		_syntax_character: $ => /[\^$\\.*+?()\[\]{}|\/]/,
 	}
-})
+});
