@@ -1,23 +1,25 @@
-const quantifierRule = prefix => $ => seq(
-	prefix($),
-	optional(alias('?', $.lazy)),
+const quantifierRule = quantifier => $ => seq(
+	quantifier($),
+	optional(alias(/\?/, $.lazy)),
 );
 
-const groupRule = identifier => $ => seq(
+const groupRule = identifier => $ => prec(1, seq(
 	$.group_begin,
 	identifier($),
 	optional(choice(
-		$.pattern,
-		$.disjunction,
+		$.$pattern,
+		$.$disjunction,
 	)),
 	$.group_end,
-);
+));
 
 module.exports = grammar({
 	name: 'regex',
 	
 	externals: $ => [
 		$.null_character,	// \0  (not followed by 0-9)
+		$._has_group_name,	// (no content) determines if a named capturing group or named backreference includes a valid group name
+		$._begin_count_quantifier,	// matches the left curly brace of a count quantifier
 	],
 	
 	extras: $ => [],
@@ -30,9 +32,9 @@ module.exports = grammar({
 	],
 	
 	inline: $ => [
-		$.pattern,
-		$.disjunction,
-		$.unit,
+		$.$pattern,
+		$.$disjunction,
+		$.$repeatable_symbol,
 		$.quantifier,
 		$._invalid__quantifier,
 		$._invalid__backreference,
@@ -56,12 +58,14 @@ module.exports = grammar({
 	],
 	
 	rules: {
+		
+		
 		regex: $ => choice(
-			$.pattern,
-			$.disjunction,
+			$.$pattern,
+			$.$disjunction,
 		),
 		
-		pattern: $ => repeat1(seq(
+		$pattern: $ => repeat1(seq(
 			$.unit,
 			optional(choice(
 				seq(
@@ -72,18 +76,18 @@ module.exports = grammar({
 			)),
 		)),
 		
-		disjunction: $ => seq(
-			optional($.pattern),
+		$disjunction: $ => seq(
+			optional($.$pattern),
 			repeat1(
 				seq(
 					$.disjunction_delimiter,
-					optional($.pattern),
+					optional($.$pattern),
 				),
 			),
 		),
 		disjunction_delimiter: $ => '|',
 		
-		unit: $ => choice(
+		$repeatable_symbol: $ => choice(
 			$.non_syntax_character,						// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 			$._syntax_character,
 			$.any_character,							// .
@@ -113,60 +117,69 @@ module.exports = grammar({
 		//#####  quantifiers  #####
 		
 		
-		quantifier: $ => choice(
-			$.zero_or_more,		// * *?
-			$.one_or_more,		// + +?
-			$.optional,			// ? ??
-			$.count_quantifier,	// {__} {__,} {__,__} {__}? {__,}? {__,__}?
-		),
-		_invalid__quantifier: $ => choice(
-			/\{\}/,
-			/\{,/,
-			/\{[0-9]*[^0-9,}]/,
-			/\{[0-9]+,[0-9]*[^0-9}]/,
-		),
-		_invalid__secondary_quantifier: $ => /[?*+{]/,
+		$quantifier: $ => prec.right(seq(
+			choice(
+				$.optional,											// ? ??
+				$.zero_or_more,										// * *?
+				$.one_or_more,										// + +?
+				$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
+			),
+			repeat(alias($.$invalid_extra_quantifier, $.invalid)),
+		)),
 		
-		
-		zero_or_more: quantifierRule($ => '*'),
-		one_or_more: quantifierRule($ => '+'),
-		optional: quantifierRule($ => '?'),
+		optional: quantifierRule($ => /\?/),
+		zero_or_more: quantifierRule($ => /\*/),
+		one_or_more: quantifierRule($ => /\+/),
 		count_quantifier: quantifierRule($ => seq(
-			'{',
+			$._begin_count_quantifier,
 			seq(
 				alias(/[0-9]+/, $.count_quantifier_value),
 				optional(seq(
-					alias(',', $.count_quantifier_delimiter),
+					alias(/,/, $.count_quantifier_delimiter),
 					optional(alias(/[0-9]+/, $.count_quantifier_value)),
 				)),
 			),
-			'}',
+			/\}/,
 		)),
 		
-		
-		//#####  lookaround assertions  #####
-		
-		
-		lookahead_assertion: groupRule($ => alias('?=', $.lookahead_identifier)),
-		negative_lookahead_assertion: groupRule($ => alias('?!', $.negative_lookahead_identifier)),
-		lookbehind_assertion: groupRule($ => alias('?<=', $.lookbehind_identifier)),
-		negative_lookbehind_assertion: groupRule($ => alias('?<!', $.negative_lookbehind_identifier)),
+		$invalid_extra_quantifier: $ => choice(
+			/[?*+]/,
+			seq(
+				$._begin_count_quantifier,
+				/[0-9]+(,[0-9]*)?\}/,
+			),
+		),
 		
 		
 		//#####  backreferences  #####
 		
 		
-		backreference: $ => choice(
-			seq(
-				'\\',
-				/[1-9][0-9]*/
-			),
-			seq(
-				'\\k<',
-				$.group_name,
-				'>',
-			),
+		$backreference: $ => choice(
+			$.numeric_backreference,
+			$.named_backreference,
+//			alias($.$nonconforming_named_backreference, $.identity_escape),
 		),
+		
+		numeric_backreference: $ => seq(
+			$._backslash,
+			/[1-9][0-9]*/,
+		),
+		
+		named_backreference: $ => seq(
+			$.$named_backreference_prefix,	// \k
+			/</,
+			$.group_name,
+			/>/,
+		),
+		$named_backreference_prefix: $ => seq(
+			$._backslash,
+			/k/,
+			$._has_group_name,		// (no content) matches if the backreference includes a valid group name
+		),
+//		$nonconforming_named_backreference: $ => seq(
+//			alias($._backslash, $.escape_operator),
+//			/k/,
+//		),
 		_invalid__backreference: $ => choice(
 			'\\k<>',
 			prec.right(seq(
@@ -177,122 +190,150 @@ module.exports = grammar({
 		),
 		
 		
-		//#####  groups  #####
+		//#####  groups and lookaround assertions  #####
 		
 		
-		named_capturing_group: groupRule($ => choice(
-			$.named_capturing_group_identifier,
-			seq(
-				'?<',
-				optional($._invalid__group_name),
-				'>',
-			),
-		)),
-		named_capturing_group_identifier: $ => seq(
-			'?<',
-			$.group_name,
-			'>',
+		$group_or_lookaround: $ => choice(
+			$.lookahead_assertion,													// (?=__)
+			$.negative_lookahead_assertion,											// (?!__)
+			$.lookbehind_assertion,													// (?<=__)
+			$.negative_lookbehind_assertion,										// (?<!__)
+			$.non_capturing_group,													// (?:__)
+			$.named_capturing_group,												// (?<__>__)
+			$.anonymous_capturing_group,											// (__)
+			$.$invalid_group,
 		),
+		
+		
+		lookahead_assertion: groupRule($ => alias(/\?=/, $.lookahead_identifier)),
+		negative_lookahead_assertion: groupRule($ => alias(/\?!/, $.negative_lookahead_identifier)),
+		lookbehind_assertion: groupRule($ => alias(/\?<=/, $.lookbehind_identifier)),
+		negative_lookbehind_assertion: groupRule($ => alias(/\?<!/, $.negative_lookbehind_identifier)),
+		
+		
+		non_capturing_group: groupRule($ => alias(/\?:/, $.non_capturing_group_identifier)),
+		
+		
+		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
+		named_capturing_group_identifier: $ => seq(
+			$.$named_capturing_group_identifier_prefix,	// ?
+			/</,
+			$.group_name,
+			/>/,
+		),
+		$named_capturing_group_identifier_prefix: $ => seq(
+			/\?/,
+			$._has_group_name,		// (no content) matches if the identifier includes a valid group name
+		),
+		
 		
 		//TODO: Tree-sitter doesn't support Unicode property escapes, so I can't reasonably make this match the spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
-		group_name: $ => seq(
+		/*group_name: $ => seq(
 			choice(
-				///[\p{ID_Start}$_]/,
-				/[a-zA-Z0-9_$]/,
+				/[\p{ID_Start}$_]/,
 				$.unicode_escape,
 			),
 			repeat(
 				choice(
-					///[\p{ID_Continue}$_\u200C\u200D]/,
-					/[a-zA-Z0-9$_]/,
+					/[\p{ID_Continue}$_\u200C\u200D]/,
 					$.unicode_escape,
-				),
+				)
 			),
-		),
-		_invalid__group_name: $ => seq(
-			optional(
-				///[\p{ID_Start}$_]/,
-				/[a-zA-Z0-9_$]/,
-			),
-			repeat1($._invalid__group_name_part),
-			repeat(choice(
-				///[\p{ID_Continue}$_\u200C\u200D]/,
-				/[a-zA-Z0-9$_]/,
-				$._unicode_escape,
-			)),
-		),
-		_invalid__group_name_part: $ => seq(
-			repeat(choice(
-				///[\p{ID_Continue}$_\u200C\u200D]/,
-				/[a-zA-Z0-9$_]/,
-				$._unicode_escape,
-			)),
+		),*/
+		group_name: $ => prec.right(repeat1(
 			choice(
-				///[^\p{ID_Continue}$_\u200C\u200D>]/,
-				/[^a-zA-Z0-9$_>]/,
-				/\\[fnrtv]/,
-				$._invalid__character_escape,
+				/[a-zA-Z0-9$_]/,
+				$.unicode_escape,
 			),
-		),
+		)),
 		
-		non_capturing_group: groupRule($ => alias('?:', $.non_capturing_group_identifier)),
 		
 		anonymous_capturing_group: groupRule($ => blank()),
 		
-		group_begin: $ => '(',
-		group_end: $ => ')',
+		
+		$invalid_group: $ => choice(
+			prec.left(1, seq(
+				alias($.group_begin, $.invalid),
+				alias(/\?/, $.invalid),
+				optional(choice(
+					$.$pattern,
+					$.$disjunction,
+				)),
+				optional(alias($.group_end, $.invalid)),
+			)),
+			alias($.group_end, $.invalid),
+		),
+		
+		
+		group_begin: $ => /\(/,
+		group_end: $ => /\)/,
+		
+		
+		//#####  boundary assertions  #####
+		
+		
+		$boundary_assertion: $ => choice(
+			$.boundary_assertion,		// \b
+			$.non_boundary_assertion,	// \B
+			$.start_assertion,			// ^
+			$.end_assertion,			// $
+		),
+		
+		
+		boundary_assertion: $ => seq(
+			$._backslash, /b/,
+		),
+		non_boundary_assertion: $ => seq(
+			$._backslash, /B/,
+		),
+		
+		
+		start_assertion: $ => /\^/,
+		end_assertion: $ => /\$/,
 		
 		
 		//#####  character sets  #####
 		
 		
+		$character_set: $ => choice(
+			alias($.character_set, $.character_class),				//renamed to match pre-existing themes
+			alias($._invalid_character_set_delimiter, $.invalid),	// invalid [ ]
+		),
+		
 		character_set: $ => seq(
-			alias('[', $.set_begin),
-			optional(alias('^', $.set_negation)),
+			alias(/\[/, $.set_begin),
+			optional(alias(/\^/, $.set_negation)),
 			repeat(
-				prec.right(choice(
-					alias($.set_range, $.character_range),
-					seq(
-						$.set_atom,
-						optional(alias('-', $.non_syntax_character)),	//otherwise, a hyphen at the end of the character set would be an error (e.g., `[a-]`) - TODO: why is it an error???
-					),
-				)),
+				choice(
+					$.character_range,											// __-__
+					$.character_class_escape,									// \d \D \s \S \w \W
+					$.$s_character_escape,										// \f \n \r \t \v \b \c__ \x__ \u__ \0
+					alias($._dash, $.non_syntax),						// -
+					alias($._s_non_syntax_character, $.non_syntax),	// NOT: - \ ] or newline
+				),
 			),
-			alias(']', $.set_end),
+			alias(/\]/, $.set_end),
 		),
 		
-		set_range: $ => seq(
-			$.set_range_atom,
-			alias('-', $.range_delimiter),
-			$.set_range_atom,
-		),
+		//make sure this is below $.character_set in the code
+		_invalid_character_set_delimiter: $ => /[\[\]]/,
 		
-		set_range_atom: $ => choice(
-			prec(1, choice(
-				alias(/[^\\\]]/, $.non_syntax_character),		// NOT: \ ]
-				$.character_escape,	
-				alias('\\b', $.special_escape),
-				$._invalid__in_set__character_escape,
-			)),
-			$.identity_escape,
-			alias($.set_identity_escape, $.identity_escape),	// \-
-			$._invalid__identity_escape,
-		),
 		
-		set_atom: $ => choice(
-			prec(1, choice(
-				alias(/[^\\\]]/, $.non_syntax_character),		// NOT: \ ]
-				$.character_escape,
-				alias('\\b', $.special_escape),
-				$._invalid__in_set__character_escape,
-				$.character_class_escape,
-				$._invalid__in_set__character_class_escape,
-			)),
-			$.identity_escape,
-			alias($.set_identity_escape, $.identity_escape),	// \-
-			$._invalid__identity_escape,
+		//#####  character ranges  #####
+		
+		
+		character_range: $ => prec.dynamic(1, seq(
+			$.$character_range_unit,
+			alias($._dash, $.range_delimiter),
+			$.$character_range_unit,
+		)),
+		
+		$character_range_unit: $ => choice(
+			$.$s_character_escape,										// \f \n \r \t \v \b \c__ \x__ \u__ \0
+			alias($._dash, $.non_syntax),						// -
+			alias($._s_non_syntax_character, $.non_syntax),	// NOT: - \ ] or newline
 		),
 		
 		
@@ -374,12 +415,22 @@ module.exports = grammar({
 		//#####  character escapes  #####
 		
 		
-		character_escape: $ => choice(
+		$p_character_escape: $ => prec.left(choice(
 			$.null_character,
-			$.special_escape,
+			alias($.$p_special_escape, $.special_escape),
 			$.control_letter_escape,
 			$.hexadecimal_escape,
 			$.unicode_escape,
+			alias($.$p_identity_escape, $.identity_escape),
+		)),
+		$s_character_escape: $ => choice(
+			$.null_character,
+			alias($.$s_special_escape, $.special_escape),
+			$.control_letter_escape,
+			$.octal_escape,
+			$.hexadecimal_escape,
+			$.unicode_escape,
+			alias($.$s_identity_escape, $.identity_escape),
 		),
 		_invalid__character_escape: $ => choice(
 			$._invalid__null_character,
@@ -394,20 +445,40 @@ module.exports = grammar({
 			$._invalid__in_set__unicode_escape,
 		),
 		
-		//escapes that remove any special meaning of a character
-		identity_escape: $ => seq(
-			alias($._escape_operator, $.escape_operator),
-			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
+		$p_special_escape: $ => seq(
+			$._backslash, /[fnrtv]/,
 		),
-		_invalid__identity_escape: $ => seq(
-			'\\',
-			/[^\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
+		$s_special_escape: $ => seq(
+			$._backslash, /[fnrtvb]/,
 		),
-		set_identity_escape: $ => seq(
-			alias($._escape_operator, $.escape_operator),
-			'-',
+		
+		
+		control_letter_escape: $ => seq(
+			$._backslash,
+			/c/,
+			alias(/[a-zA-Z]/, $.control_letter_code),
 		),
-			
+		_invalid__in_set__control_letter_escape: $ => seq(
+			'\\c',
+			/[^a-zA-Z\\\]]/,
+		),
+		
+		hexadecimal_escape: $ => seq(
+			'\\x',
+			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
+		),
+		_invalid__hexadecimal_escape: $ => seq(
+			'\\x',
+			optional(/[a-fA-F0-9]/),
+			optional(/[^a-fA-F0-9\\\[(){|]/),
+		),
+		_invalid__in_set__hexadecimal_escape: $ => seq(
+			'\\x',
+			optional(/[a-fA-F0-9]/),
+			/[^a-fA-F0-9\\\]]/,
+		),
+		
+		
 		unicode_escape: $ => prec(1, choice(
 			seq(
 				'\\u',
@@ -469,52 +540,27 @@ module.exports = grammar({
 			),
 		),
 		
-		hexadecimal_escape: $ => seq(
-			'\\x',
-			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
+		//escapes that remove any special meaning of a character
+		identity_escape: $ => seq(
+			alias($._escape_operator, $.escape_operator),
+			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
-		_invalid__hexadecimal_escape: $ => seq(
-			'\\x',
-			optional(/[a-fA-F0-9]/),
-			optional(/[^a-fA-F0-9\\\[(){|]/),
+		_invalid__identity_escape: $ => seq(
+			'\\',
+			/[^\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
-		_invalid__in_set__hexadecimal_escape: $ => seq(
-			'\\x',
-			optional(/[a-fA-F0-9]/),
-			/[^a-fA-F0-9\\\]]/,
+		set_identity_escape: $ => seq(
+			alias($._escape_operator, $.escape_operator),
+			'-',
 		),
-		
-		control_letter_escape: $ => seq(
-			'\\c',
-			alias(/[a-zA-Z]/, $.control_letter_code),
-		),
-		_invalid__control_letter_escape: $ => seq(
-			'\\c',
-			optional(/[^a-zA-Z\\\[(){|]/),
-		),
-		_invalid__in_set__control_letter_escape: $ => seq(
-			'\\c',
-			/[^a-zA-Z\\\]]/,
-		),
-		
-		_invalid__null_character: $ => /\\0[0-9]/,
-		
-		special_escape: $ => /\\[fnrtv]/,
-		
-		_escape_operator: $ => '\\',
-		
-		
-		//#####  boundary assertions  #####
-		
-		
-		start_assertion: $ => '^',
-		end_assertion: $ => '$',
-		boundary_assertion: $ => '\\b',
-		non_boundary_assertion: $ => '\\B',
-		
+			
 		
 		//#####  characters  #####
 		
+		
+		_invalid__null_character: $ => /\\0[0-9]/,
+		
+		_escape_operator: $ => '\\',
 		
 		any_character: $ => '.',
 		
