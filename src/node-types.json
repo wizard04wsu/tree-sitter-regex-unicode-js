@@ -1,12 +1,16 @@
 [
   {
-    "type": "anonymous_capturing_group",
+    "type": "$invalid_group",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "$invalid_group",
+          "named": true
+        },
         {
           "type": "anonymous_capturing_group",
           "named": true
@@ -16,7 +20,134 @@
           "named": true
         },
         {
-          "type": "backreference",
+          "type": "boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "character_class",
+          "named": true
+        },
+        {
+          "type": "character_class_escape",
+          "named": true
+        },
+        {
+          "type": "control_letter_escape",
+          "named": true
+        },
+        {
+          "type": "count_quantifier",
+          "named": true
+        },
+        {
+          "type": "disjunction_delimiter",
+          "named": true
+        },
+        {
+          "type": "end_assertion",
+          "named": true
+        },
+        {
+          "type": "hexadecimal_escape",
+          "named": true
+        },
+        {
+          "type": "identity_escape",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
+          "named": true
+        },
+        {
+          "type": "named_capturing_group",
+          "named": true
+        },
+        {
+          "type": "negative_lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "negative_lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "non_boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax",
+          "named": true
+        },
+        {
+          "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
+          "named": true
+        },
+        {
+          "type": "one_or_more",
+          "named": true
+        },
+        {
+          "type": "optional",
+          "named": true
+        },
+        {
+          "type": "special_escape",
+          "named": true
+        },
+        {
+          "type": "start_assertion",
+          "named": true
+        },
+        {
+          "type": "unicode_escape",
+          "named": true
+        },
+        {
+          "type": "zero_or_more",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "anonymous_capturing_group",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
+          "type": "anonymous_capturing_group",
+          "named": true
+        },
+        {
+          "type": "any_character",
           "named": true
         },
         {
@@ -64,11 +195,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -92,11 +231,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -121,21 +264,6 @@
         },
         {
           "type": "zero_or_more",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "backreference",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "group_name",
           "named": true
         }
       ]
@@ -175,7 +303,11 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "non_syntax",
           "named": true
         },
         {
@@ -249,7 +381,11 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "non_syntax",
           "named": true
         },
         {
@@ -355,6 +491,21 @@
     }
   },
   {
+    "type": "invalid",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "escape_operator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "lookahead_assertion",
     "named": true,
     "fields": {},
@@ -363,15 +514,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -419,6 +570,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
@@ -428,6 +583,10 @@
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -451,11 +610,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -494,15 +657,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -550,6 +713,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
@@ -559,6 +726,10 @@
         },
         {
           "type": "lookbehind_identifier",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -582,11 +753,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -617,6 +792,21 @@
     }
   },
   {
+    "type": "named_backreference",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "group_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "named_capturing_group",
     "named": true,
     "fields": {},
@@ -625,15 +815,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -681,11 +871,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -713,11 +911,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -771,15 +973,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -827,11 +1029,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -859,11 +1069,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -902,15 +1116,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -958,11 +1172,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -990,11 +1212,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -1025,6 +1251,11 @@
     }
   },
   {
+    "type": "non_boundary_assertion",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "non_capturing_group",
     "named": true,
     "fields": {},
@@ -1033,15 +1264,15 @@
       "required": true,
       "types": [
         {
+          "type": "$invalid_group",
+          "named": true
+        },
+        {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -1089,11 +1320,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -1121,11 +1360,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -1154,6 +1397,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "numeric_backreference",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "one_or_more",
@@ -1191,18 +1439,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
+        {
+          "type": "$invalid_group",
+          "named": true
+        },
         {
           "type": "anonymous_capturing_group",
           "named": true
         },
         {
           "type": "any_character",
-          "named": true
-        },
-        {
-          "type": "backreference",
           "named": true
         },
         {
@@ -1242,11 +1490,19 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "lookahead_assertion",
           "named": true
         },
         {
           "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
           "named": true
         },
         {
@@ -1270,11 +1526,15 @@
           "named": true
         },
         {
-          "type": "non_syntax_character",
+          "type": "non_syntax",
           "named": true
         },
         {
           "type": "null_character",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
           "named": true
         },
         {
@@ -1345,70 +1605,6 @@
     }
   },
   {
-    "type": "*",
-    "named": false
-  },
-  {
-    "type": "+",
-    "named": false
-  },
-  {
-    "type": "-",
-    "named": false
-  },
-  {
-    "type": "=",
-    "named": false
-  },
-  {
-    "type": ">",
-    "named": false
-  },
-  {
-    "type": "?",
-    "named": false
-  },
-  {
-    "type": "?<",
-    "named": false
-  },
-  {
-    "type": "\\",
-    "named": false
-  },
-  {
-    "type": "\\b",
-    "named": false
-  },
-  {
-    "type": "\\c",
-    "named": false
-  },
-  {
-    "type": "\\k<",
-    "named": false
-  },
-  {
-    "type": "\\k<>",
-    "named": false
-  },
-  {
-    "type": "\\u",
-    "named": false
-  },
-  {
-    "type": "\\u{",
-    "named": false
-  },
-  {
-    "type": "\\x",
-    "named": false
-  },
-  {
-    "type": "^",
-    "named": false
-  },
-  {
     "type": "any_character",
     "named": true
   },
@@ -1430,6 +1626,10 @@
   },
   {
     "type": "end_assertion",
+    "named": true
+  },
+  {
+    "type": "escape_operator",
     "named": true
   },
   {
@@ -1465,15 +1665,11 @@
     "named": true
   },
   {
-    "type": "non_boundary_assertion",
-    "named": true
-  },
-  {
     "type": "non_capturing_group_identifier",
     "named": true
   },
   {
-    "type": "non_syntax_character",
+    "type": "non_syntax",
     "named": true
   },
   {
@@ -1507,13 +1703,5 @@
   {
     "type": "unicode_property_value",
     "named": true
-  },
-  {
-    "type": "{",
-    "named": false
-  },
-  {
-    "type": "}",
-    "named": false
   }
 ]

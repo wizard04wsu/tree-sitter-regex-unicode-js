@@ -27,12 +27,11 @@ bool tree_sitter_regex_external_scanner_scan(
 			return false;
 		}
 		advance(lexer);
-		if (lexer->lookahead == 0 || strchr("0123456789", lexer->lookahead) != NULL) {	//0-9
+		if (lexer->lookahead != 0 && strchr("0123456789", lexer->lookahead) != NULL) {	//0-9
 			return false;
 		}
 		lexer->result_symbol = NULL_CHAR;
 		return true;
-	}
 	}
 	else if (valid_symbols[HAS_GROUP_NAME] && lexer->lookahead == '<') {
 		lexer->mark_end(lexer);
