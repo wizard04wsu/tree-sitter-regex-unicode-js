@@ -17,9 +17,11 @@ module.exports = grammar({
 	name: 'regex',
 	
 	externals: $ => [
-		$.null_character,	// \0  (not followed by 0-9)
-		$._has_group_name,	// (no content) determines if a named capturing group or named backreference includes a valid group name
-		$._begin_count_quantifier,	// matches the left curly brace of a count quantifier
+		$.null_character,					// \0  (not followed by 0-9)
+		$._has_group_name,					// (no content) determines if a named capturing group or named backreference includes a valid group name
+		$._begin_count_quantifier,			// matches the left curly brace of a count quantifier
+		$._begin_unicode_codepoint_escape,	// matches the left curly brace of a unicode code point escape
+		$._begin_unicode_property_escape,	// matches the left curly brace of a unicode property escape
 	],
 	
 	extras: $ => [],
@@ -72,12 +74,17 @@ module.exports = grammar({
 		),
 		
 		
-		$pattern: $ => repeat1(
-			choice(
-				$.$boundary_assertion,
-				seq(
-					$.$repeatable_symbol,
-					optional($.$quantifier),
+		$pattern: $ => seq(
+			optional(
+				alias($.$quantifier, $.invalid),
+			),
+			repeat1(
+				choice(
+					$.$boundary_assertion,
+					seq(
+						$.$repeatable_symbol,
+						optional($.$quantifier),
+					),
 				),
 			),
 		),
@@ -87,11 +94,10 @@ module.exports = grammar({
 			$.$backreference,											// \1 ... \9 \1__ ... \9__ \k<__>   invalid: \k
 			$.$group_or_lookaround,										// (__) (?<__>__) (?:__) (?=__) (?!__) (?<=__) (?<!__)   invalid: ( (? )
 			$.$character_set,											// [__] [^__]   invalid: [ ]
-			$.character_class_escape,					// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
-			$.$p_character_escape,							// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
+			$.character_class_escape,									// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
+			$.$p_character_escape,										// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
 			$.any_character,											// .
-			alias(/[{}]/, $.non_syntax),
-			alias($._p_non_syntax_character, $.non_syntax),	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
+			alias($._p_non_syntax_character, $.non_syntax),				// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		),
 		
 		
@@ -207,11 +213,13 @@ module.exports = grammar({
 			choice(
 				/[\p{ID_Start}$_]/,
 				$.unicode_escape,
+				$.unicode_codepoint_escape,
 			),
 			repeat(
 				choice(
 					/[\p{ID_Continue}$_\u200C\u200D]/,
 					$.unicode_escape,
+					$.unicode_codepoint_escape,
 				)
 			),
 		),*/
@@ -219,6 +227,7 @@ module.exports = grammar({
 			choice(
 				/[a-zA-Z0-9$_]/,
 				$.unicode_escape,
+				$.unicode_codepoint_escape,
 			),
 		)),
 		
@@ -280,11 +289,11 @@ module.exports = grammar({
 			optional(alias(/\^/, $.set_negation)),
 			repeat(
 				choice(
-					$.character_range,											// __-__
-					$.character_class_escape,									// \d \D \s \S \w \W
-					$.$s_character_escape,										// \f \n \r \t \v \b \c__ \x__ \u__ \0
+					$.character_range,									// __-__
+					$.character_class_escape,							// \d \D \s \S \w \W
+					$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \0
 					alias($._dash, $.non_syntax),						// -
-					alias($._s_non_syntax_character, $.non_syntax),	// NOT: - \ ] or newline
+					alias($._s_non_syntax_character, $.non_syntax),		// NOT: - \ ] or newline
 				),
 			),
 			alias(/\]/, $.set_end),
@@ -304,9 +313,9 @@ module.exports = grammar({
 		)),
 		
 		$character_range_unit: $ => choice(
-			$.$s_character_escape,										// \f \n \r \t \v \b \c__ \x__ \u__ \0
+			$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \0
 			alias($._dash, $.non_syntax),						// -
-			alias($._s_non_syntax_character, $.non_syntax),	// NOT: - \ ] or newline
+			alias($._s_non_syntax_character, $.non_syntax),		// NOT: - \ ] or newline
 		),
 		
 		
@@ -348,7 +357,9 @@ module.exports = grammar({
 			$.control_letter_escape,
 			$.hexadecimal_escape,
 			$.unicode_escape,
+			$.unicode_codepoint_escape,
 			alias($.$p_identity_escape, $.identity_escape),
+			alias($.$invalid_null_character, $.invalid),
 			alias($.$invalid_control_letter_escape, $.invalid),
 			alias($.$invalid_hexadecimal_escape, $.invalid),
 			alias($.$invalid_unicode_escape, $.invalid),
@@ -360,11 +371,19 @@ module.exports = grammar({
 			$.control_letter_escape,
 			$.hexadecimal_escape,
 			$.unicode_escape,
+			$.unicode_codepoint_escape,
 			alias($.$s_identity_escape, $.identity_escape),
+			alias($.$invalid_null_character, $.invalid),
 			alias($.$invalid_control_letter_escape, $.invalid),
 			alias($.$invalid_hexadecimal_escape, $.invalid),
 			alias($.$invalid_unicode_escape, $.invalid),
 			alias($.$s_invalid_identity_escape, $.invalid),
+		),
+		
+		
+		$invalid_null_character: $ => seq(
+			$._backslash,
+			/0/,
 		),
 		
 		
@@ -384,7 +403,7 @@ module.exports = grammar({
 			alias(/[a-zA-Z]/, $.control_letter_code),
 		),
 		$invalid_control_letter_escape: $ => seq(
-			alias($._backslash, $.escape_operator),
+			$._backslash,
 			/c/,
 		),
 		
@@ -394,34 +413,26 @@ module.exports = grammar({
 			alias(/[a-fA-F0-9]{2}/, $.hexadecimal_code),
 		),
 		$invalid_hexadecimal_escape: $ => seq(
-			alias($._backslash, $.escape_operator),
+			$._backslash,
 			/x/,
 		),
 		
 		
-		unicode_escape: $ => prec(1, choice(
-			seq(
-				$._backslash,
-				/u/,
-				alias(/[a-fA-F0-9]{4}/, $.unicode_code),
-			),
-			seq(
-				$._backslash,
-				/u/,
-				/\{/,
-				alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
-				/\}/,
-			),
-		)),
-		$invalid_unicode_escape: $ => choice(
-			seq(
-				alias($._backslash, $.escape_operator),
-				/u/,
-			),
-//			seq(
-//				alias($._backslash, $.escape_operator),
-//				/u\{/,
-//			),
+		unicode_escape: $ => seq(
+			$._backslash,
+			/u/,
+			alias(/[a-fA-F0-9]{4}/, $.unicode_code),
+		),
+		unicode_codepoint_escape: $ => seq(
+			$._backslash,
+			/u/,
+			$._begin_unicode_codepoint_escape,
+			alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
+			/\}/,
+		),
+		$invalid_unicode_escape: $ =>seq(
+			$._backslash,
+			/u/,
 		),
 		
 		
@@ -430,20 +441,20 @@ module.exports = grammar({
 		
 		$p_identity_escape: $ => seq(
 			alias($._backslash, $.escape_operator),
-			/[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
+			/[$^\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		),
 		$p_invalid_identity_escape: $ => seq(
 			$._backslash,
-			/[^\^$\\.*+?()\[\]{}|\/]/,
+			/[^$^\\.*+?()\[\]{}|\/dDsSwWbBfnrtvcxu0-9k]/,
 		),
 		
 		$s_identity_escape: $ => seq(
 			alias($._backslash, $.escape_operator),
-			/[-^$\\.*+?()\[\]{}|\/]/,	// - ^ $ \ . * + ? ( ) [ ] { } | /
+			/[-$^\\.*+?()\[\]{}|\/]/,	// - ^ $ \ . * + ? ( ) [ ] { } | /
 		),
 		$s_invalid_identity_escape: $ => seq(
 			$._backslash,
-			/[^-^$\\.*+?()\[\]{}|\/]/,
+			/[^-$^\\.*+?()\[\]{}|\/dDsSwWbfnrtvcxu0]/,
 		),
 		
 		

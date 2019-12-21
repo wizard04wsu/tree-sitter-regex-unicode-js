@@ -5,6 +5,8 @@ enum TokenType {
 	NULL_CHAR,
 	HAS_GROUP_NAME,
 	BEGIN_COUNT_QUANTIFIER,
+	BEGIN_UNICODE_CODEPOINT,
+	BEGIN_UNICODE_PROPERTY,
 };
 
 void * tree_sitter_regex_external_scanner_create() { return NULL; }
@@ -67,25 +69,65 @@ bool tree_sitter_regex_external_scanner_scan(
 			return true;
 		}
 	}
-	else if (valid_symbols[BEGIN_COUNT_QUANTIFIER] && lexer->lookahead == '{') {
+	else if (lexer->lookahead == '{') {
 		advance(lexer);
 		lexer->mark_end(lexer);
-		char digits[] = "0123456789";
-		if (lexer->lookahead == 0 || strchr(digits, lexer->lookahead) == NULL) {
-			return false;
-		}
-		while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
-			advance(lexer);
-		}
-		if (lexer->lookahead == ',') {
-			advance(lexer);
+		if (valid_symbols[BEGIN_COUNT_QUANTIFIER]) {
+			char digits[] = "0123456789";
+			if (lexer->lookahead == 0 || strchr(digits, lexer->lookahead) == NULL) {
+				return false;
+			}
 			while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
 				advance(lexer);
 			}
+			if (lexer->lookahead == ',') {
+				advance(lexer);
+				while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
+					advance(lexer);
+				}
+			}
+			if (lexer->lookahead == '}') {
+				lexer->result_symbol = BEGIN_COUNT_QUANTIFIER;
+				return true;
+			}
 		}
-		if (lexer->lookahead == '}') {
-			lexer->result_symbol = BEGIN_COUNT_QUANTIFIER;
-			return true;
+		else if (valid_symbols[BEGIN_UNICODE_CODEPOINT]) {
+			char hex[] = "0123456789abcdefABCDEF";
+			if (lexer->lookahead == 0 || strchr(hex, lexer->lookahead) == NULL) {
+				return false;
+			}
+			while (lexer->lookahead == '0') {
+				advance(lexer);
+			}
+			int len = 5;
+			if (lexer->lookahead == '1') {
+				advance(lexer);
+				len--;
+				if (lexer->lookahead == '0') {
+					advance(lexer);
+				}
+			}
+			int i = 0;
+			for (; i<len; i++) {
+				if (lexer->lookahead == 0) {
+					return false;
+				}
+				if (lexer->lookahead == '}') {
+					break;
+				}
+				if (strchr(hex, lexer->lookahead) == NULL) {
+					return false;
+				}
+				advance(lexer);
+			}
+			if (i > 0 && lexer->lookahead == '}') {
+				lexer->result_symbol = BEGIN_UNICODE_CODEPOINT;
+				return true;
+			}
+		}
+		else if (valid_symbols[BEGIN_UNICODE_PROPERTY]) {
+			//TODO
+			return false;
 		}
 	}
 	
