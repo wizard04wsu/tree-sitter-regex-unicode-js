@@ -1,4 +1,4 @@
-const quantifierRule = quantifier => $ => prec.right(seq(
+const quantifierRule = quantifier => $ => prec.right(2, seq(
 	quantifier($),
 	optional(alias(/\?/, $.lazy)),
 ));
@@ -86,7 +86,7 @@ module.exports = grammar({
 							$.$repeatable_symbol,
 							optional($.$quantifier),
 						),
-						//$.$invalid_syntax_character,
+						$.$invalid_syntax_character,
 					),
 				),
 			),
@@ -104,7 +104,7 @@ module.exports = grammar({
 			alias($._p_non_syntax_character, $.non_syntax),				// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		),
 		
-		$invalid_syntax_character: $ => alias($._p_syntax_character, $.invalid),			// invalid use of: ^ $ \ . * + ? ( ) [ ] { } | /
+		$invalid_syntax_character: $ => alias(/[()}]/, $.invalid),	// invalid use of syntax characters
 		
 		
 		//#####  quantifiers  #####
@@ -117,6 +117,8 @@ module.exports = grammar({
 				$.one_or_more,										// + +?
 				$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
 			),
+			repeat(alias(/[?*+]/, $.invalid)),
+			//optional(alias(/\{/, $.invalid)),
 		),
 		
 		optional: quantifierRule($ => /\?/),
@@ -349,7 +351,7 @@ module.exports = grammar({
 		
 		
 		$p_character_escape: $ => prec.left(choice(
-			prec(1, $.null_character),
+			$.$null_character,
 			alias($.$p_special_escape, $.special_escape),
 			$.control_letter_escape,
 			$.hexadecimal_escape,
@@ -363,7 +365,7 @@ module.exports = grammar({
 			alias($.$p_invalid_identity_escape, $.invalid),
 		)),
 		$s_character_escape: $ => choice(
-			prec(1, $.null_character),
+			$.$null_character,
 			alias($.$s_special_escape, $.special_escape),
 			$.control_letter_escape,
 			$.hexadecimal_escape,
@@ -377,6 +379,8 @@ module.exports = grammar({
 			alias($.$s_invalid_identity_escape, $.invalid),
 		),
 		
+		
+		$null_character: $ => prec(1, $.null_character),
 		
 		$invalid_null_character: $ => seq(
 			$._backslash,
@@ -423,7 +427,7 @@ module.exports = grammar({
 		unicode_codepoint_escape: $ => seq(
 			$._backslash,
 			/u/,
-			$._begin_unicode_codepoint_escape,
+			$._begin_unicode_codepoint_escape,	// {
 			alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
 			/\}/,
 		),
@@ -470,8 +474,6 @@ module.exports = grammar({
 		
 		_p_non_syntax_character: $ => /[^\^$\\.*+?()\[\]{}|\/\n]/,	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		_s_non_syntax_character: $ => /[^-\\\]\n]/,			// NOT: - \ ] or newline
-		
-		_p_syntax_character: $ => /[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		
 	}
 });

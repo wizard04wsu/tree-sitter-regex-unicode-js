@@ -23,17 +23,18 @@ bool tree_sitter_regex_external_scanner_scan(
 	TSLexer *lexer,
 	const bool *valid_symbols
 ) {
-	if (valid_symbols[NULL_CHAR] && lexer->lookahead == '\\') {
+	if (lexer->lookahead == '\\') {
+		lexer->mark_end(lexer);
 		advance(lexer);
-		if (lexer->lookahead != '0') {
-			return false;
+		if (valid_symbols[NULL_CHAR] && lexer->lookahead == '0') {
+			advance(lexer);
+			if (lexer->lookahead != 0 && strchr("0123456789", lexer->lookahead) != NULL) {	//0-9
+				return false;
+			}
+			lexer->mark_end(lexer);
+			lexer->result_symbol = NULL_CHAR;
+			return true;
 		}
-		advance(lexer);
-		if (lexer->lookahead != 0 && strchr("0123456789", lexer->lookahead) != NULL) {	//0-9
-			return false;
-		}
-		lexer->result_symbol = NULL_CHAR;
-		return true;
 	}
 	else if (valid_symbols[HAS_GROUP_NAME] && lexer->lookahead == '<') {
 		lexer->mark_end(lexer);
@@ -70,9 +71,10 @@ bool tree_sitter_regex_external_scanner_scan(
 		}
 	}
 	else if (lexer->lookahead == '{') {
-		advance(lexer);
 		lexer->mark_end(lexer);
+		advance(lexer);
 		if (valid_symbols[BEGIN_COUNT_QUANTIFIER]) {
+			lexer->mark_end(lexer);
 			char digits[] = "0123456789";
 			if (lexer->lookahead == 0 || strchr(digits, lexer->lookahead) == NULL) {
 				return false;
@@ -92,6 +94,7 @@ bool tree_sitter_regex_external_scanner_scan(
 			}
 		}
 		else if (valid_symbols[BEGIN_UNICODE_CODEPOINT]) {
+			lexer->mark_end(lexer);
 			char hex[] = "0123456789abcdefABCDEF";
 			if (lexer->lookahead == 0 || strchr(hex, lexer->lookahead) == NULL) {
 				return false;
@@ -126,6 +129,7 @@ bool tree_sitter_regex_external_scanner_scan(
 			}
 		}
 		else if (valid_symbols[BEGIN_UNICODE_PROPERTY]) {
+			lexer->mark_end(lexer);
 			//TODO
 			return false;
 		}
