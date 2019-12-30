@@ -1,7 +1,7 @@
-const quantifierRule = quantifier => $ => seq(
+const quantifierRule = quantifier => $ => prec.right(seq(
 	quantifier($),
 	optional(alias(/\?/, $.lazy)),
-);
+));
 
 const groupRule = identifier => $ => prec(1, seq(
 	$.group_begin,
@@ -41,8 +41,8 @@ module.exports = grammar({
 		$.$disjunction,
 		$.$pattern,
 		$.$quantifier,
-		$.$invalid_extra_quantifier,
 		$.$repeatable_symbol,
+//		$.$invalid_syntax_character,
 		$.$backreference,
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
@@ -74,19 +74,23 @@ module.exports = grammar({
 		),
 		
 		
-		$pattern: $ => seq(
-			optional(
-				alias($.$quantifier, $.invalid),
-			),
-			repeat1(
-				choice(
-					$.$boundary_assertion,
-					seq(
-						$.$repeatable_symbol,
-						optional($.$quantifier),
+		$pattern: $ => choice(
+			seq(
+				optional(
+					alias($.$quantifier, $.invalid),
+				),
+				repeat1(
+					choice(
+						$.$boundary_assertion,
+						seq(
+							$.$repeatable_symbol,
+							optional($.$quantifier),
+						),
+						//$.$invalid_syntax_character,
 					),
 				),
 			),
+			alias($.$quantifier, $.invalid),
 		),
 		
 		
@@ -100,19 +104,20 @@ module.exports = grammar({
 			alias($._p_non_syntax_character, $.non_syntax),				// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		),
 		
+		$invalid_syntax_character: $ => alias($._p_syntax_character, $.invalid),			// invalid use of: ^ $ \ . * + ? ( ) [ ] { } | /
+		
 		
 		//#####  quantifiers  #####
 		
 		
-		$quantifier: $ => prec.right(seq(
+		$quantifier: $ => seq(
 			choice(
 				$.optional,											// ? ??
 				$.zero_or_more,										// * *?
 				$.one_or_more,										// + +?
 				$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
 			),
-			repeat(alias($.$invalid_extra_quantifier, $.invalid)),
-		)),
+		),
 		
 		optional: quantifierRule($ => /\?/),
 		zero_or_more: quantifierRule($ => /\*/),
@@ -128,14 +133,6 @@ module.exports = grammar({
 			),
 			/\}/,
 		)),
-		
-		$invalid_extra_quantifier: $ => choice(
-			/[?*+]/,
-			seq(
-				$._begin_count_quantifier,
-				/[0-9]+(,[0-9]*)?\}/,
-			),
-		),
 		
 		
 		//#####  backreferences  #####
@@ -473,6 +470,8 @@ module.exports = grammar({
 		
 		_p_non_syntax_character: $ => /[^\^$\\.*+?()\[\]{}|\/\n]/,	// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		_s_non_syntax_character: $ => /[^-\\\]\n]/,			// NOT: - \ ] or newline
+		
+		_p_syntax_character: $ => /[\^$\\.*+?()\[\]{}|\/]/,	// ^ $ \ . * + ? ( ) [ ] { } | /
 		
 	}
 });

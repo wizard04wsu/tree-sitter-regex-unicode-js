@@ -56,57 +56,71 @@
       ]
     },
     "$pattern": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
-          "type": "CHOICE",
+          "type": "SEQ",
           "members": [
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "$quantifier"
-              },
-              "named": true,
-              "value": "invalid"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "$quantifier"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
             },
             {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "REPEAT1",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "$boundary_assertion"
-              },
-              {
-                "type": "SEQ",
+              "type": "REPEAT1",
+              "content": {
+                "type": "CHOICE",
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$repeatable_symbol"
+                    "name": "$boundary_assertion"
                   },
                   {
-                    "type": "CHOICE",
+                    "type": "SEQ",
                     "members": [
                       {
                         "type": "SYMBOL",
-                        "name": "$quantifier"
+                        "name": "$repeatable_symbol"
                       },
                       {
-                        "type": "BLANK"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "$quantifier"
+                          },
+                          {
+                            "type": "BLANK"
+                          }
+                        ]
                       }
                     ]
                   }
                 ]
               }
-            ]
-          }
+            }
+          ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "$quantifier"
+          },
+          "named": true,
+          "value": "invalid"
         }
       ]
     },
@@ -148,235 +162,222 @@
         }
       ]
     },
+    "$invalid_syntax_character": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_p_syntax_character"
+      },
+      "named": true,
+      "value": "invalid"
+    },
     "$quantifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "optional"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "zero_or_more"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "one_or_more"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "count_quantifier"
+            }
+          ]
+        }
+      ]
+    },
+    "optional": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
           {
+            "type": "PATTERN",
+            "value": "\\?"
+          },
+          {
             "type": "CHOICE",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "optional"
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "\\?"
+                },
+                "named": true,
+                "value": "lazy"
               },
               {
-                "type": "SYMBOL",
-                "name": "zero_or_more"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "one_or_more"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "count_quantifier"
+                "type": "BLANK"
               }
             ]
-          },
-          {
-            "type": "REPEAT",
-            "content": {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "$invalid_extra_quantifier"
-              },
-              "named": true,
-              "value": "invalid"
-            }
           }
         ]
       }
     },
-    "optional": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "PATTERN",
-          "value": "\\?"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "\\?"
-              },
-              "named": true,
-              "value": "lazy"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
-    },
     "zero_or_more": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "PATTERN",
-          "value": "\\*"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "\\?"
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "\\*"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "\\?"
+                },
+                "named": true,
+                "value": "lazy"
               },
-              "named": true,
-              "value": "lazy"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "one_or_more": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "PATTERN",
-          "value": "\\+"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "\\?"
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "\\+"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "\\?"
+                },
+                "named": true,
+                "value": "lazy"
               },
-              "named": true,
-              "value": "lazy"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "count_quantifier": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_begin_count_quantifier"
-            },
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "PATTERN",
-                    "value": "[0-9]+"
-                  },
-                  "named": true,
-                  "value": "count_quantifier_value"
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "ALIAS",
-                          "content": {
-                            "type": "PATTERN",
-                            "value": ","
-                          },
-                          "named": true,
-                          "value": "count_quantifier_delimiter"
-                        },
-                        {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "ALIAS",
-                              "content": {
-                                "type": "PATTERN",
-                                "value": "[0-9]+"
-                              },
-                              "named": true,
-                              "value": "count_quantifier_value"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "PATTERN",
-              "value": "\\}"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "\\?"
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_begin_count_quantifier"
               },
-              "named": true,
-              "value": "lazy"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        }
-      ]
-    },
-    "$invalid_extra_quantifier": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "PATTERN",
-          "value": "[?*+]"
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_begin_count_quantifier"
-            },
-            {
-              "type": "PATTERN",
-              "value": "[0-9]+(,[0-9]*)?\\}"
-            }
-          ]
-        }
-      ]
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "[0-9]+"
+                    },
+                    "named": true,
+                    "value": "count_quantifier_value"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "ALIAS",
+                            "content": {
+                              "type": "PATTERN",
+                              "value": ","
+                            },
+                            "named": true,
+                            "value": "count_quantifier_delimiter"
+                          },
+                          {
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "PATTERN",
+                                  "value": "[0-9]+"
+                                },
+                                "named": true,
+                                "value": "count_quantifier_value"
+                              },
+                              {
+                                "type": "BLANK"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\}"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "\\?"
+                },
+                "named": true,
+                "value": "lazy"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "$backreference": {
       "type": "CHOICE",
@@ -1723,6 +1724,10 @@
     "_s_non_syntax_character": {
       "type": "PATTERN",
       "value": "[^-\\\\\\]\\n]"
+    },
+    "_p_syntax_character": {
+      "type": "PATTERN",
+      "value": "[\\^$\\\\.*+?()\\[\\]{}|\\/]"
     }
   },
   "extras": [],
@@ -1780,7 +1785,6 @@
     "$disjunction",
     "$pattern",
     "$quantifier",
-    "$invalid_extra_quantifier",
     "$repeatable_symbol",
     "$backreference",
     "$named_backreference_prefix",
