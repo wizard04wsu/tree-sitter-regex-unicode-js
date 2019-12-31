@@ -19,9 +19,9 @@ module.exports = grammar({
 	externals: $ => [
 		$.null_character,					// \0  (not followed by 0-9)
 		$._has_group_name,					// (no content) determines if a named capturing group or named backreference includes a valid group name
-		$._begin_count_quantifier,			// matches the left curly brace of a count quantifier
-		$._begin_unicode_codepoint_escape,	// matches the left curly brace of a unicode code point escape
-		$._begin_unicode_property_escape,	// matches the left curly brace of a unicode property escape
+		$._begin_count_quantifier,			// (no content) determines if next token begins a count quantifier
+		$._begin_unicode_codepoint_escape,	// (no content) determines if next token begins a unicode code point escape
+		$._begin_unicode_property_escape,	// (no content) determines if next token begins a unicode property escape
 	],
 	
 	extras: $ => [],
@@ -42,7 +42,7 @@ module.exports = grammar({
 		$.$pattern,
 		$.$quantifier,
 		$.$repeatable_symbol,
-//		$.$invalid_syntax_character,
+		$.$invalid_syntax_character,
 		$.$backreference,
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
@@ -76,9 +76,8 @@ module.exports = grammar({
 		
 		$pattern: $ => choice(
 			seq(
-				optional(
-					alias($.$quantifier, $.invalid),
-				),
+				repeat(alias(/[?*+]/, $.invalid)),
+				optional(alias(/\{/, $.invalid)),
 				repeat1(
 					choice(
 						$.$boundary_assertion,
@@ -90,7 +89,11 @@ module.exports = grammar({
 					),
 				),
 			),
-			alias($.$quantifier, $.invalid),
+			seq(
+				repeat1(alias(/[?*+]/, $.invalid)),
+				optional(alias(/\{/, $.invalid)),
+			),
+			alias(/\{/, $.invalid),
 		),
 		
 		
@@ -104,7 +107,7 @@ module.exports = grammar({
 			alias($._p_non_syntax_character, $.non_syntax),				// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		),
 		
-		$invalid_syntax_character: $ => alias(/[()}]/, $.invalid),	// invalid use of syntax characters
+		$invalid_syntax_character: $ => alias(/[(){}]/, $.invalid),	// invalid use of syntax characters
 		
 		
 		//#####  quantifiers  #####
@@ -117,8 +120,7 @@ module.exports = grammar({
 				$.one_or_more,										// + +?
 				$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
 			),
-			repeat(alias(/[?*+]/, $.invalid)),
-			//optional(alias(/\{/, $.invalid)),
+//			repeat(alias(/[?*+]/, $.invalid)),
 		),
 		
 		optional: quantifierRule($ => /\?/),
@@ -126,6 +128,7 @@ module.exports = grammar({
 		one_or_more: quantifierRule($ => /\+/),
 		count_quantifier: quantifierRule($ => seq(
 			$._begin_count_quantifier,
+			/\{/,
 			seq(
 				alias(/[0-9]+/, $.count_quantifier_value),
 				optional(seq(
@@ -428,6 +431,7 @@ module.exports = grammar({
 			$._backslash,
 			/u/,
 			$._begin_unicode_codepoint_escape,	// {
+			/\{/,
 			alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
 			/\}/,
 		),

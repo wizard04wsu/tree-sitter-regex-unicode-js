@@ -62,13 +62,25 @@
           "type": "SEQ",
           "members": [
             {
+              "type": "REPEAT",
+              "content": {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "[?*+]"
+                },
+                "named": true,
+                "value": "invalid"
+              }
+            },
+            {
               "type": "CHOICE",
               "members": [
                 {
                   "type": "ALIAS",
                   "content": {
-                    "type": "SYMBOL",
-                    "name": "$quantifier"
+                    "type": "PATTERN",
+                    "value": "\\{"
                   },
                   "named": true,
                   "value": "invalid"
@@ -118,10 +130,44 @@
           ]
         },
         {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "[?*+]"
+                },
+                "named": true,
+                "value": "invalid"
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "\\{"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "type": "ALIAS",
           "content": {
-            "type": "SYMBOL",
-            "name": "$quantifier"
+            "type": "PATTERN",
+            "value": "\\{"
           },
           "named": true,
           "value": "invalid"
@@ -170,7 +216,7 @@
       "type": "ALIAS",
       "content": {
         "type": "PATTERN",
-        "value": "[()}]"
+        "value": "[(){}]"
       },
       "named": true,
       "value": "invalid"
@@ -198,18 +244,6 @@
               "name": "count_quantifier"
             }
           ]
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "ALIAS",
-            "content": {
-              "type": "PATTERN",
-              "value": "[?*+]"
-            },
-            "named": true,
-            "value": "invalid"
-          }
         }
       ]
     },
@@ -315,6 +349,10 @@
               {
                 "type": "SYMBOL",
                 "name": "_begin_count_quantifier"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\{"
               },
               {
                 "type": "SEQ",
@@ -1625,7 +1663,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "$begin_unicode_codepoint_escape"
+          "name": "_begin_unicode_codepoint_escape"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\{"
         },
         {
           "type": "ALIAS",
@@ -1654,14 +1696,6 @@
           "value": "u"
         }
       ]
-    },
-    "$begin_unicode_codepoint_escape": {
-      "type": "PREC",
-      "value": 5,
-      "content": {
-        "type": "SYMBOL",
-        "name": "_begin_unicode_codepoint_escape"
-      }
     },
     "$p_identity_escape": {
       "type": "SEQ",
@@ -1806,6 +1840,7 @@
     "$pattern",
     "$quantifier",
     "$repeatable_symbol",
+    "$invalid_syntax_character",
     "$backreference",
     "$named_backreference_prefix",
     "$group_or_lookaround",

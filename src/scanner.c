@@ -17,6 +17,66 @@ void tree_sitter_regex_external_scanner_deserialize(void *payload, const char *b
 static void advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
 }
+static bool checkForLazyQuantifier(TSLexer *lexer) {
+	//TODO
+}
+static bool checkForCountQuantifier(TSLexer *lexer) {
+	char digits[] = "0123456789";
+	if (lexer->lookahead == 0 || strchr(digits, lexer->lookahead) == NULL) {
+		return false;
+	}
+	while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
+		advance(lexer);
+	}
+	if (lexer->lookahead == ',') {
+		advance(lexer);
+		while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
+			advance(lexer);
+		}
+	}
+	if (lexer->lookahead == '}') {
+		return true;
+	}
+	return false;
+}
+static bool checkForUnicodeCodePoint(TSLexer *lexer) {
+	char hex[] = "0123456789abcdefABCDEF";
+	if (lexer->lookahead == 0 || strchr(hex, lexer->lookahead) == NULL) {
+		return false;
+	}
+	while (lexer->lookahead == '0') {
+		advance(lexer);
+	}
+	int len = 5;
+	if (lexer->lookahead == '1') {
+		advance(lexer);
+		len--;
+		if (lexer->lookahead == '0') {
+			advance(lexer);
+		}
+	}
+	int i = 0;
+	for (; i<len; i++) {
+		if (lexer->lookahead == 0) {
+			return false;
+		}
+		if (lexer->lookahead == '}') {
+			break;
+		}
+		if (strchr(hex, lexer->lookahead) == NULL) {
+			return false;
+		}
+		advance(lexer);
+	}
+	if (i > 0 && lexer->lookahead == '}') {
+		return true;
+	}
+	return false;
+}
+static bool checkForUnicodeProperty(TSLexer *lexer) {
+	//TODO
+	return false;
+}
 
 bool tree_sitter_regex_external_scanner_scan(
 	void *payload,
@@ -73,65 +133,17 @@ bool tree_sitter_regex_external_scanner_scan(
 	else if (lexer->lookahead == '{') {
 		lexer->mark_end(lexer);
 		advance(lexer);
-		if (valid_symbols[BEGIN_COUNT_QUANTIFIER]) {
-			lexer->mark_end(lexer);
-			char digits[] = "0123456789";
-			if (lexer->lookahead == 0 || strchr(digits, lexer->lookahead) == NULL) {
-				return false;
-			}
-			while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
-				advance(lexer);
-			}
-			if (lexer->lookahead == ',') {
-				advance(lexer);
-				while (lexer->lookahead != 0 && strchr(digits, lexer->lookahead) != NULL) {
-					advance(lexer);
-				}
-			}
-			if (lexer->lookahead == '}') {
-				lexer->result_symbol = BEGIN_COUNT_QUANTIFIER;
-				return true;
-			}
+		if (valid_symbols[BEGIN_COUNT_QUANTIFIER] && checkForCountQuantifier(lexer)) {
+			lexer->result_symbol = BEGIN_COUNT_QUANTIFIER;
+			return true;
 		}
-		else if (valid_symbols[BEGIN_UNICODE_CODEPOINT]) {
-			lexer->mark_end(lexer);
-			char hex[] = "0123456789abcdefABCDEF";
-			if (lexer->lookahead == 0 || strchr(hex, lexer->lookahead) == NULL) {
-				return false;
-			}
-			while (lexer->lookahead == '0') {
-				advance(lexer);
-			}
-			int len = 5;
-			if (lexer->lookahead == '1') {
-				advance(lexer);
-				len--;
-				if (lexer->lookahead == '0') {
-					advance(lexer);
-				}
-			}
-			int i = 0;
-			for (; i<len; i++) {
-				if (lexer->lookahead == 0) {
-					return false;
-				}
-				if (lexer->lookahead == '}') {
-					break;
-				}
-				if (strchr(hex, lexer->lookahead) == NULL) {
-					return false;
-				}
-				advance(lexer);
-			}
-			if (i > 0 && lexer->lookahead == '}') {
-				lexer->result_symbol = BEGIN_UNICODE_CODEPOINT;
-				return true;
-			}
+		else if (valid_symbols[BEGIN_UNICODE_CODEPOINT] && checkForUnicodeCodePoint(lexer)) {
+			lexer->result_symbol = BEGIN_UNICODE_CODEPOINT;
+			return true;
 		}
-		else if (valid_symbols[BEGIN_UNICODE_PROPERTY]) {
-			lexer->mark_end(lexer);
-			//TODO
-			return false;
+		else if (valid_symbols[BEGIN_UNICODE_PROPERTY] && checkForUnicodeProperty(lexer)) {
+			lexer->result_symbol = BEGIN_UNICODE_PROPERTY;
+			return true;
 		}
 	}
 	
