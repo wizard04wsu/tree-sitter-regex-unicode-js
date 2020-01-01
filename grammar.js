@@ -1,6 +1,13 @@
 const quantifierRule = quantifier => $ => prec.right(2, seq(
 	quantifier($),
-	optional(alias(/\?/, $.lazy)),
+//	optional(alias(/\?/, $.lazy)),
+	optional(seq(
+		choice(
+			alias(/\?/, $.lazy),
+			alias(/[*+]/, $.invalid),
+		),
+		repeat(alias(/[?*+]/, $.invalid)),
+	)),
 ));
 
 const groupRule = identifier => $ => prec(1, seq(
@@ -17,11 +24,12 @@ module.exports = grammar({
 	name: 'regex',
 	
 	externals: $ => [
-		$.null_character,					// \0  (not followed by 0-9)
-		$._has_group_name,					// (no content) determines if a named capturing group or named backreference includes a valid group name
-		$._begin_count_quantifier,			// (no content) determines if next token begins a count quantifier
-		$._begin_unicode_codepoint_escape,	// (no content) determines if next token begins a unicode code point escape
-		$._begin_unicode_property_escape,	// (no content) determines if next token begins a unicode property escape
+		$.null_character,							// \0  (not followed by 0-9)
+		$._begin_group_name,						// (no content) determines if next token begins a group name   <__>
+		$._begin_named_capturing_group_identifier,	// (no content) determines if next token begins a named capturing group identifier   ?<__>
+		$._begin_count_quantifier,					// (no content) determines if next token begins a count quantifier   {__}
+		$._begin_unicode_codepoint,					// (no content) determines if next token begins a unicode code point   {__}
+		$._begin_unicode_property,					// (no content) determines if next token begins a unicode property   {__}
 	],
 	
 	extras: $ => [],
@@ -42,11 +50,11 @@ module.exports = grammar({
 		$.$pattern,
 		$.$quantifier,
 		$.$repeatable_symbol,
-		$.$invalid_syntax_character,
 		$.$backreference,
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
 		$.$named_capturing_group_identifier_prefix,
+		$.$invalid_group,
 		$.$character_set,
 		$.$boundary_assertion,
 		$.$character_range_unit,
@@ -85,7 +93,7 @@ module.exports = grammar({
 							$.$repeatable_symbol,
 							optional($.$quantifier),
 						),
-						$.$invalid_syntax_character,
+						alias(/[{}]/, $.invalid),
 					),
 				),
 			),
@@ -107,20 +115,15 @@ module.exports = grammar({
 			alias($._p_non_syntax_character, $.non_syntax),				// NOT: ^ $ \ . * + ? ( ) [ ] { } | / or newline
 		),
 		
-		$invalid_syntax_character: $ => alias(/[(){}]/, $.invalid),	// invalid use of syntax characters
-		
 		
 		//#####  quantifiers  #####
 		
 		
-		$quantifier: $ => seq(
-			choice(
-				$.optional,											// ? ??
-				$.zero_or_more,										// * *?
-				$.one_or_more,										// + +?
-				$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
-			),
-//			repeat(alias(/[?*+]/, $.invalid)),
+		$quantifier: $ => choice(
+			$.optional,											// ? ??
+			$.zero_or_more,										// * *?
+			$.one_or_more,										// + +?
+			$.count_quantifier,									// {__} {__,} {__,__} {__}? {__,}? {__,__}?
 		),
 		
 		optional: quantifierRule($ => /\?/),
@@ -155,15 +158,12 @@ module.exports = grammar({
 		),
 		
 		named_backreference: $ => seq(
-			$.$named_backreference_prefix,	// \k
+			$._backslash,
+			/k/,
+			$._begin_group_name,		// (no content) matches if the backreference includes a valid group name
 			/</,
 			$.group_name,
 			/>/,
-		),
-		$named_backreference_prefix: $ => seq(
-			$._backslash,
-			/k/,
-			$._has_group_name,		// (no content) matches if the backreference includes a valid group name
 		),
 		$invalid_named_backreference: $ => seq(
 			$._backslash,
@@ -197,14 +197,10 @@ module.exports = grammar({
 		
 		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
 		named_capturing_group_identifier: $ => seq(
-			$.$named_capturing_group_identifier_prefix,	// ?
-			/</,
+			$._begin_named_capturing_group_identifier,
+			/\?</,
 			$.group_name,
 			/>/,
-		),
-		$named_capturing_group_identifier_prefix: $ => seq(
-			/\?/,
-			$._has_group_name,		// (no content) matches if the identifier includes a valid group name
 		),
 		
 		
@@ -347,7 +343,6 @@ module.exports = grammar({
 			alias($._backslash, $.escape_operator),
 			/[pP]/,
 		),
-
 		
 		
 		//#####  character escapes  #####
@@ -430,7 +425,7 @@ module.exports = grammar({
 		unicode_codepoint_escape: $ => seq(
 			$._backslash,
 			/u/,
-			$._begin_unicode_codepoint_escape,	// {
+			$._begin_unicode_codepoint,	// (no content)
 			/\{/,
 			alias(/0*(?:[a-fA-F0-9]{1,5}|10[a-fA-F0-9]{4})/, $.unicode_code),
 			/\}/,
