@@ -1029,71 +1029,6 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "PREC_LEFT",
-          "value": 1,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "\\?"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "group_end"
-                    },
-                    "named": true,
-                    "value": "invalid"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        {
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
@@ -1941,6 +1876,7 @@
     "ReferenceError",
     "$group_or_lookaround",
     "ReferenceError",
+    "$invalid_group",
     "$character_set",
     "$boundary_assertion",
     "$character_range_unit",

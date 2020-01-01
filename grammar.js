@@ -54,6 +54,7 @@ module.exports = grammar({
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
 		$.$named_capturing_group_identifier_prefix,
+		$.$invalid_group,
 		$.$character_set,
 		$.$boundary_assertion,
 		$.$character_range_unit,
@@ -233,15 +234,15 @@ module.exports = grammar({
 		
 		
 		$invalid_group: $ => choice(
-			prec.left(1, seq(
+/*			prec.left(1, seq(
 				alias($.group_begin, $.invalid),
-				alias(/\?/, $.invalid),
+				//alias(/\?/, $.invalid),
 				optional(choice(
 					$.$pattern,
 					$.$disjunction,
 				)),
-				optional(alias($.group_end, $.invalid)),
-			)),
+				//optional(alias($.group_end, $.invalid)),
+			)),*/
 			alias($.group_end, $.invalid),
 		),
 		
