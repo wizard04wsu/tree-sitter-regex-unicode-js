@@ -54,7 +54,6 @@ module.exports = grammar({
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
 		$.$named_capturing_group_identifier_prefix,
-		$.$invalid_group,
 		$.$character_set,
 		$.$boundary_assertion,
 		$.$character_range_unit,

@@ -124,7 +124,7 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "PATTERN",
-                      "value": "[){}]"
+                      "value": "[{}]"
                     },
                     "named": true,
                     "value": "invalid"
@@ -655,6 +655,10 @@
         {
           "type": "SYMBOL",
           "name": "anonymous_capturing_group"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "$invalid_group"
         }
       ]
     },
@@ -1040,6 +1044,15 @@
                 "value": "invalid"
               },
               {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "\\?"
+                },
+                "named": true,
+                "value": "invalid"
+              },
+              {
                 "type": "CHOICE",
                 "members": [
                   {
@@ -1054,6 +1067,23 @@
                         "name": "$disjunction"
                       }
                     ]
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "group_end"
+                    },
+                    "named": true,
+                    "value": "invalid"
                   },
                   {
                     "type": "BLANK"
@@ -1911,7 +1941,6 @@
     "ReferenceError",
     "$group_or_lookaround",
     "ReferenceError",
-    "$invalid_group",
     "$character_set",
     "$boundary_assertion",
     "$character_range_unit",
