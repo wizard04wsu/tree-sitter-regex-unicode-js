@@ -100,31 +100,14 @@
                     "name": "$boundary_assertion"
                   },
                   {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$repeatable_symbol"
-                      },
-                      {
-                        "type": "CHOICE",
-                        "members": [
-                          {
-                            "type": "SYMBOL",
-                            "name": "$quantifier"
-                          },
-                          {
-                            "type": "BLANK"
-                          }
-                        ]
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$symbol"
                   },
                   {
                     "type": "ALIAS",
                     "content": {
-                      "type": "PATTERN",
-                      "value": "[{}]"
+                      "type": "SYMBOL",
+                      "name": "$invalid_symbol"
                     },
                     "named": true,
                     "value": "invalid"
@@ -176,6 +159,48 @@
           },
           "named": true,
           "value": "invalid"
+        }
+      ]
+    },
+    "$symbol": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "$repeatable_symbol"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "$quantifier"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "$invalid_symbol": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[{}]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "$invalid_group_begin"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "$invalid_group_end"
         }
       ]
     },
@@ -1021,25 +1046,27 @@
         ]
       }
     },
-    "$invalid_group": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "group_end"
-          },
-          "named": true,
-          "value": "invalid"
-        }
-      ]
-    },
     "group_begin": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "PATTERN",
+        "value": "\\("
+      }
+    },
+    "group_end": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "PATTERN",
+        "value": "\\)"
+      }
+    },
+    "$invalid_group_begin": {
       "type": "PATTERN",
       "value": "\\("
     },
-    "group_end": {
+    "$invalid_group_end": {
       "type": "PATTERN",
       "value": "\\)"
     },
@@ -1109,15 +1136,6 @@
           },
           "named": true,
           "value": "character_class"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_invalid_character_set_delimiter"
-          },
-          "named": true,
-          "value": "invalid"
         }
       ]
     },
@@ -1818,9 +1836,6 @@
       "anonymous_capturing_group"
     ],
     [
-      "$invalid_group"
-    ],
-    [
       "named_backreference",
       "$invalid_named_backreference"
     ],
@@ -1835,6 +1850,14 @@
     ],
     [
       "count_quantifier"
+    ],
+    [
+      "group_begin",
+      "$invalid_group_begin"
+    ],
+    [
+      "group_end",
+      "$invalid_group_end"
     ]
   ],
   "externals": [
@@ -1867,12 +1890,12 @@
     "$disjunction",
     "$pattern",
     "$quantifier",
+    "$symbol",
     "$repeatable_symbol",
     "$backreference",
     "ReferenceError",
     "$group_or_lookaround",
     "ReferenceError",
-    "$invalid_group",
     "$character_set",
     "$boundary_assertion",
     "$character_range_unit",

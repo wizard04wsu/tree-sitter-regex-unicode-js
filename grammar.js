@@ -37,24 +37,25 @@ module.exports = grammar({
 	conflicts: $ => [
 		[ $.character_set, $.character_range, ],
 		[ $.anonymous_capturing_group, ],
-		[ $.$invalid_group, ],
 		[ $.named_backreference, $.$invalid_named_backreference, ],
 		[ $.optional, ],
 		[ $.zero_or_more, ],
 		[ $.one_or_more, ],
 		[ $.count_quantifier, ],
+		[ $.group_begin, $.$invalid_group_begin, ],
+		[ $.group_end, $.$invalid_group_end, ],
 	],
 	
 	inline: $ => [
 		$.$disjunction,
 		$.$pattern,
 		$.$quantifier,
+		$.$symbol,
 		$.$repeatable_symbol,
 		$.$backreference,
 		$.$named_backreference_prefix,
 		$.$group_or_lookaround,
 		$.$named_capturing_group_identifier_prefix,
-		$.$invalid_group,
 		$.$character_set,
 		$.$boundary_assertion,
 		$.$character_range_unit,
@@ -89,11 +90,8 @@ module.exports = grammar({
 				repeat1(
 					choice(
 						$.$boundary_assertion,
-						seq(
-							$.$repeatable_symbol,
-							optional($.$quantifier),
-						),
-						alias(/[{}]/, $.invalid),
+						$.$symbol,
+						alias($.$invalid_symbol, $.invalid),
 					),
 				),
 			),
@@ -104,6 +102,17 @@ module.exports = grammar({
 			alias(/\{/, $.invalid),
 		),
 		
+		
+		$symbol: $ => seq(
+			$.$repeatable_symbol,
+			optional($.$quantifier),
+		),
+		$invalid_symbol: $ => choice(
+			/\]/,
+			/[{}]/,
+			$.$invalid_group_begin,
+			$.$invalid_group_end,
+		),
 		
 		$repeatable_symbol: $ => choice(
 			$.$backreference,											// \1 ... \9 \1__ ... \9__ \k<__>   invalid: \k
@@ -182,7 +191,6 @@ module.exports = grammar({
 			$.non_capturing_group,													// (?:__)
 			$.named_capturing_group,												// (?<__>__)
 			$.anonymous_capturing_group,											// (__)
-//			$.$invalid_group,
 		),
 		
 		
@@ -233,22 +241,10 @@ module.exports = grammar({
 		anonymous_capturing_group: groupRule($ => blank()),
 		
 		
-		$invalid_group: $ => choice(
-/*			prec.left(1, seq(
-				alias($.group_begin, $.invalid),
-				//alias(/\?/, $.invalid),
-				optional(choice(
-					$.$pattern,
-					$.$disjunction,
-				)),
-				//optional(alias($.group_end, $.invalid)),
-			)),*/
-			alias($.group_end, $.invalid),
-		),
-		
-		
-		group_begin: $ => /\(/,
-		group_end: $ => /\)/,
+		group_begin: $ => prec(1, /\(/),
+		group_end: $ => prec(1, /\)/),
+		$invalid_group_begin: $ => /\(/,
+		$invalid_group_end: $ => /\)/,
 		
 		
 		//#####  boundary assertions  #####
@@ -279,7 +275,7 @@ module.exports = grammar({
 		
 		$character_set: $ => choice(
 			alias($.character_set, $.character_class),				//renamed to match pre-existing themes
-			alias($._invalid_character_set_delimiter, $.invalid),	// invalid [ ]
+			//alias($._invalid_character_set_delimiter, $.invalid),	// invalid [ ]
 		),
 		
 		character_set: $ => seq(
