@@ -655,10 +655,6 @@
         {
           "type": "SYMBOL",
           "name": "anonymous_capturing_group"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "$invalid_group"
         }
       ]
     },

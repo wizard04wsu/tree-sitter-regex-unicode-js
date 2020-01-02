@@ -107,7 +107,7 @@ module.exports = grammar({
 		
 		$repeatable_symbol: $ => choice(
 			$.$backreference,											// \1 ... \9 \1__ ... \9__ \k<__>   invalid: \k
-			$.$group_or_lookaround,										// (__) (?<__>__) (?:__) (?=__) (?!__) (?<=__) (?<!__)   invalid: ( (? )
+			$.$group_or_lookaround,										// (__) (?<__>__) (?:__) (?=__) (?!__) (?<=__) (?<!__)
 			$.$character_set,											// [__] [^__]   invalid: [ ]
 			$.character_class_escape,									// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
 			$.$p_character_escape,										// \f \n \r \t \v \c__ \x__ \u__ \u{__} \0 \^ \$ \\ \. \* \+ \? \( \) \[ \] \{ \} \| \/
@@ -182,7 +182,7 @@ module.exports = grammar({
 			$.non_capturing_group,													// (?:__)
 			$.named_capturing_group,												// (?<__>__)
 			$.anonymous_capturing_group,											// (__)
-			$.$invalid_group,
+//			$.$invalid_group,
 		),
 		
 		
