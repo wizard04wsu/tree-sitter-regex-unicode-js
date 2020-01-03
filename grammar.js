@@ -19,6 +19,14 @@ const groupRule = identifier => $ => seq(
 	)),
 	$.group_end,
 );
+const invalidGroupRule = identifier => $ => prec.right(seq(
+	alias($.group_begin, $.invalid),
+	identifier($),
+	optional(choice(
+		$.$pattern,
+		$.$disjunction,
+	)),
+));
 
 module.exports = grammar({
 	name: 'regex',
@@ -49,8 +57,6 @@ module.exports = grammar({
 		[ $.non_capturing_group, ],
 		[ $.named_capturing_group, ],
 		[ $.anonymous_capturing_group, ],
-		
-//		[ $.group_end, $.$invalid_group_end, ],
 		
 		[ $.character_set, $.character_range, ],
 	],
@@ -100,10 +106,10 @@ module.exports = grammar({
 		$disjunction: $ => seq(
 			optional($.$pattern),
 			repeat1(
-				seq(
+				prec.right(seq(
 					$.disjunction_delimiter,
 					optional($.$pattern),
-				),
+				)),
 			),
 		),
 		
@@ -135,7 +141,7 @@ module.exports = grammar({
 		$invalid_symbol: $ => choice(
 			/\]/,
 			/[{}]/,
-			//$.$invalid_group_end,
+			$.$invalid_group_end,
 		),
 		
 		$repeatable_symbol: $ => choice(
@@ -220,45 +226,58 @@ module.exports = grammar({
 		
 		$lookahead_assertion: $ => choice(
 			$.lookahead_assertion,
-			alias($.group_begin, $.invalid),
+			$.$invalid_lookahead_assertion,
 		),
 		$negative_lookahead_assertion: $ => choice(
 			$.negative_lookahead_assertion,
-			alias($.group_begin, $.invalid),
+			$.$invalid_negative_lookahead_assertion,
 		),
 		$lookbehind_assertion: $ => choice(
 			$.lookbehind_assertion,
-			alias($.group_begin, $.invalid),
+			$.$invalid_lookbehind_assertion,
 		),
 		$negative_lookbehind_assertion: $ => choice(
 			$.negative_lookbehind_assertion,
-			alias($.group_begin, $.invalid),
+			$.$invalid_negative_lookbehind_assertion,
 		),
 		
 		$non_capturing_group: $ => choice(
 			$.non_capturing_group,
-			alias($.group_begin, $.invalid),
+			$.$invalid_non_capturing_group,
 		),
 		$named_capturing_group: $ => choice(
 			$.named_capturing_group,
-			alias($.group_begin, $.invalid),
+			$.$invalid_named_capturing_group,
 		),
 		$anonymous_capturing_group: $ => choice(
 			$.anonymous_capturing_group,
-			alias($.group_begin, $.invalid),
+			$.$invalid_anonymous_capturing_group,
 		),
 		
 		
-		lookahead_assertion: groupRule($ => alias(/\?=/, $.lookahead_identifier)),
-		negative_lookahead_assertion: groupRule($ => alias(/\?!/, $.negative_lookahead_identifier)),
-		lookbehind_assertion: groupRule($ => alias(/\?<=/, $.lookbehind_identifier)),
-		negative_lookbehind_assertion: groupRule($ => alias(/\?<!/, $.negative_lookbehind_identifier)),
+		lookahead_assertion: groupRule($ => $.lookahead_identifier),
+		negative_lookahead_assertion: groupRule($ => $.negative_lookahead_identifier),
+		lookbehind_assertion: groupRule($ => $.lookbehind_identifier),
+		negative_lookbehind_assertion: groupRule($ => $.negative_lookbehind_identifier),
+		
+		$invalid_lookahead_assertion: invalidGroupRule($ => $.lookahead_identifier),
+		$invalid_negative_lookahead_assertion: invalidGroupRule($ => $.negative_lookahead_identifier),
+		$invalid_lookbehind_assertion: invalidGroupRule($ => $.lookbehind_identifier),
+		$invalid_negative_lookbehind_assertion: invalidGroupRule($ => $.negative_lookbehind_identifier),
+		
+		lookahead_identifier: $ => /\?=/,
+		negative_lookahead_identifier: $ => /\?!/,
+		lookbehind_identifier: $ => /\?<=/,
+		negative_lookbehind_identifier: $ => /\?<!/,
 		
 		
-		non_capturing_group: groupRule($ => alias(/\?:/, $.non_capturing_group_identifier)),
+		non_capturing_group: groupRule($ => $.non_capturing_group_identifier),
+		$invalid_non_capturing_group: invalidGroupRule($ => $.non_capturing_group_identifier),
+		non_capturing_group_identifier: $ => /\?:/,
 		
 		
 		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
+		$invalid_named_capturing_group: invalidGroupRule($ => $.named_capturing_group_identifier),
 		named_capturing_group_identifier: $ => seq(
 			$._begin_named_capturing_group_identifier,
 			/\?</,
@@ -294,10 +313,14 @@ module.exports = grammar({
 		
 		
 		anonymous_capturing_group: groupRule($ => blank()),
+		$invalid_anonymous_capturing_group: $ => prec.right(seq(
+			alias($.group_begin, $.invalid),
+		)),
 		
 		
 		group_begin: $ => prec(1, /\(/),
 		group_end: $ => prec(1, /\)/),
+		$invalid_group_begin: $ => /\(/,
 		$invalid_group_end: $ => /\)/,
 		
 		
