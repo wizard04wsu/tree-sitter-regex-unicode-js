@@ -10,7 +10,7 @@ const quantifierRule = quantifier => $ => prec.right(2, seq(
 	)),
 ));
 
-const groupRule = identifier => $ => prec(1, seq(
+const groupRule = identifier => $ => seq(
 	$.group_begin,
 	identifier($),
 	optional(choice(
@@ -18,7 +18,7 @@ const groupRule = identifier => $ => prec(1, seq(
 		$.$disjunction,
 	)),
 	$.group_end,
-));
+);
 
 module.exports = grammar({
 	name: 'regex',
@@ -35,30 +35,55 @@ module.exports = grammar({
 	extras: $ => [],
 	
 	conflicts: $ => [
-		[ $.character_set, $.character_range, ],
-		[ $.anonymous_capturing_group, ],
-		[ $.named_backreference, $.$invalid_named_backreference, ],
 		[ $.optional, ],
 		[ $.zero_or_more, ],
 		[ $.one_or_more, ],
 		[ $.count_quantifier, ],
-		[ $.group_begin, $.$invalid_group_begin, ],
-		[ $.group_end, $.$invalid_group_end, ],
+		
+		[ $.named_backreference, $.$invalid_named_backreference, ],
+		
+		[ $.lookahead_assertion, ],
+		[ $.negative_lookahead_assertion, ],
+		[ $.lookbehind_assertion, ],
+		[ $.negative_lookbehind_assertion, ],
+		[ $.non_capturing_group, ],
+		[ $.named_capturing_group, ],
+		[ $.anonymous_capturing_group, ],
+		
+//		[ $.group_end, $.$invalid_group_end, ],
+		
+		[ $.character_set, $.character_range, ],
 	],
 	
 	inline: $ => [
 		$.$disjunction,
 		$.$pattern,
-		$.$quantifier,
-		$.$symbol,
+		
+		$.$symbol_and_quantifier,
 		$.$repeatable_symbol,
+		
+		$.$quantifier,
+		
 		$.$backreference,
 		$.$named_backreference_prefix,
+		
 		$.$group_or_lookaround,
+		$.$lookahead_assertion,
+		$.$negative_lookahead_assertion,
+		$.$lookbehind_assertion,
+		$.$negative_lookbehind_assertion,
+		$.$non_capturing_group,
+		$.$named_capturing_group,
+		$.$anonymous_capturing_group,
+		
 		$.$named_capturing_group_identifier_prefix,
+		
 		$.$character_set,
+		
 		$.$boundary_assertion,
+		
 		$.$character_range_unit,
+		
 		$.$p_character_escape,
 		$.$s_character_escape,
 	],
@@ -90,7 +115,7 @@ module.exports = grammar({
 				repeat1(
 					choice(
 						$.$boundary_assertion,
-						$.$symbol,
+						$.$symbol_and_quantifier,
 						alias($.$invalid_symbol, $.invalid),
 					),
 				),
@@ -103,15 +128,14 @@ module.exports = grammar({
 		),
 		
 		
-		$symbol: $ => seq(
+		$symbol_and_quantifier: $ => seq(
 			$.$repeatable_symbol,
 			optional($.$quantifier),
 		),
 		$invalid_symbol: $ => choice(
 			/\]/,
 			/[{}]/,
-			$.$invalid_group_begin,
-			$.$invalid_group_end,
+			//$.$invalid_group_end,
 		),
 		
 		$repeatable_symbol: $ => choice(
@@ -184,13 +208,44 @@ module.exports = grammar({
 		
 		
 		$group_or_lookaround: $ => choice(
-			$.lookahead_assertion,													// (?=__)
-			$.negative_lookahead_assertion,											// (?!__)
-			$.lookbehind_assertion,													// (?<=__)
-			$.negative_lookbehind_assertion,										// (?<!__)
-			$.non_capturing_group,													// (?:__)
-			$.named_capturing_group,												// (?<__>__)
-			$.anonymous_capturing_group,											// (__)
+			$.$lookahead_assertion,													// (?=__)
+			$.$negative_lookahead_assertion,											// (?!__)
+			$.$lookbehind_assertion,													// (?<=__)
+			$.$negative_lookbehind_assertion,										// (?<!__)
+			$.$non_capturing_group,													// (?:__)
+			$.$named_capturing_group,												// (?<__>__)
+			$.$anonymous_capturing_group,											// (__)
+		),
+		
+		
+		$lookahead_assertion: $ => choice(
+			$.lookahead_assertion,
+			alias($.group_begin, $.invalid),
+		),
+		$negative_lookahead_assertion: $ => choice(
+			$.negative_lookahead_assertion,
+			alias($.group_begin, $.invalid),
+		),
+		$lookbehind_assertion: $ => choice(
+			$.lookbehind_assertion,
+			alias($.group_begin, $.invalid),
+		),
+		$negative_lookbehind_assertion: $ => choice(
+			$.negative_lookbehind_assertion,
+			alias($.group_begin, $.invalid),
+		),
+		
+		$non_capturing_group: $ => choice(
+			$.non_capturing_group,
+			alias($.group_begin, $.invalid),
+		),
+		$named_capturing_group: $ => choice(
+			$.named_capturing_group,
+			alias($.group_begin, $.invalid),
+		),
+		$anonymous_capturing_group: $ => choice(
+			$.anonymous_capturing_group,
+			alias($.group_begin, $.invalid),
 		),
 		
 		
@@ -243,7 +298,6 @@ module.exports = grammar({
 		
 		group_begin: $ => prec(1, /\(/),
 		group_end: $ => prec(1, /\)/),
-		$invalid_group_begin: $ => /\(/,
 		$invalid_group_end: $ => /\)/,
 		
 		
