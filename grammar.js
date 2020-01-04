@@ -1,6 +1,5 @@
 const quantifierRule = quantifier => $ => prec.right(2, seq(
 	quantifier($),
-//	optional(alias(/\?/, $.lazy)),
 	optional(seq(
 		choice(
 			alias(/\?/, $.lazy),
@@ -10,22 +9,24 @@ const quantifierRule = quantifier => $ => prec.right(2, seq(
 	)),
 ));
 
-const groupRule = identifier => $ => seq(
-	$.group_begin,
-	identifier($),
-	optional(choice(
-		$.$pattern,
-		$.$disjunction,
-	)),
-	$.group_end,
-);
-const invalidGroupRule = identifier => $ => prec.right(seq(
-	alias($.group_begin, $.invalid),
-	identifier($),
-	optional(choice(
-		$.$pattern,
-		$.$disjunction,
-	)),
+const groupRule = identifier => $ => prec.right(choice(
+	seq(
+		$.group_begin,
+		identifier($),
+		optional(choice(
+			$.$pattern,
+			$.$disjunction,
+		)),
+		prec(1, $.group_end),
+	),
+	seq(
+		alias($.group_begin, $.invalid),
+		identifier($),
+		optional(choice(
+			$.$pattern,
+			$.$disjunction,
+		)),
+	),
 ));
 
 module.exports = grammar({
@@ -74,14 +75,6 @@ module.exports = grammar({
 		$.$named_backreference_prefix,
 		
 		$.$group_or_lookaround,
-		$.$lookahead_assertion,
-		$.$negative_lookahead_assertion,
-		$.$lookbehind_assertion,
-		$.$negative_lookbehind_assertion,
-		$.$non_capturing_group,
-		$.$named_capturing_group,
-		$.$anonymous_capturing_group,
-		
 		$.$named_capturing_group_identifier_prefix,
 		
 		$.$character_set,
@@ -122,7 +115,6 @@ module.exports = grammar({
 					choice(
 						$.$boundary_assertion,
 						$.$symbol_and_quantifier,
-						alias($.$invalid_symbol, $.invalid),
 					),
 				),
 			),
@@ -135,13 +127,12 @@ module.exports = grammar({
 		
 		
 		$symbol_and_quantifier: $ => seq(
-			$.$repeatable_symbol,
+			choice(
+				$.$repeatable_symbol,
+				alias($.group_end, $.invalid),
+				alias(/[{}]/, $.invalid),
+			),
 			optional($.$quantifier),
-		),
-		$invalid_symbol: $ => choice(
-			/\]/,
-			/[{}]/,
-			$.$invalid_group_end,
 		),
 		
 		$repeatable_symbol: $ => choice(
@@ -214,44 +205,13 @@ module.exports = grammar({
 		
 		
 		$group_or_lookaround: $ => choice(
-			$.$lookahead_assertion,													// (?=__)
-			$.$negative_lookahead_assertion,											// (?!__)
-			$.$lookbehind_assertion,													// (?<=__)
-			$.$negative_lookbehind_assertion,										// (?<!__)
-			$.$non_capturing_group,													// (?:__)
-			$.$named_capturing_group,												// (?<__>__)
-			$.$anonymous_capturing_group,											// (__)
-		),
-		
-		
-		$lookahead_assertion: $ => choice(
-			$.lookahead_assertion,
-			$.$invalid_lookahead_assertion,
-		),
-		$negative_lookahead_assertion: $ => choice(
-			$.negative_lookahead_assertion,
-			$.$invalid_negative_lookahead_assertion,
-		),
-		$lookbehind_assertion: $ => choice(
-			$.lookbehind_assertion,
-			$.$invalid_lookbehind_assertion,
-		),
-		$negative_lookbehind_assertion: $ => choice(
-			$.negative_lookbehind_assertion,
-			$.$invalid_negative_lookbehind_assertion,
-		),
-		
-		$non_capturing_group: $ => choice(
-			$.non_capturing_group,
-			$.$invalid_non_capturing_group,
-		),
-		$named_capturing_group: $ => choice(
-			$.named_capturing_group,
-			$.$invalid_named_capturing_group,
-		),
-		$anonymous_capturing_group: $ => choice(
-			$.anonymous_capturing_group,
-			$.$invalid_anonymous_capturing_group,
+			$.lookahead_assertion,													// (?=__)
+			$.negative_lookahead_assertion,											// (?!__)
+			$.lookbehind_assertion,													// (?<=__)
+			$.negative_lookbehind_assertion,										// (?<!__)
+			$.non_capturing_group,													// (?:__)
+			$.named_capturing_group,												// (?<__>__)
+			$.anonymous_capturing_group,											// (__)
 		),
 		
 		
@@ -260,11 +220,6 @@ module.exports = grammar({
 		lookbehind_assertion: groupRule($ => $.lookbehind_identifier),
 		negative_lookbehind_assertion: groupRule($ => $.negative_lookbehind_identifier),
 		
-		$invalid_lookahead_assertion: invalidGroupRule($ => $.lookahead_identifier),
-		$invalid_negative_lookahead_assertion: invalidGroupRule($ => $.negative_lookahead_identifier),
-		$invalid_lookbehind_assertion: invalidGroupRule($ => $.lookbehind_identifier),
-		$invalid_negative_lookbehind_assertion: invalidGroupRule($ => $.negative_lookbehind_identifier),
-		
 		lookahead_identifier: $ => /\?=/,
 		negative_lookahead_identifier: $ => /\?!/,
 		lookbehind_identifier: $ => /\?<=/,
@@ -272,12 +227,10 @@ module.exports = grammar({
 		
 		
 		non_capturing_group: groupRule($ => $.non_capturing_group_identifier),
-		$invalid_non_capturing_group: invalidGroupRule($ => $.non_capturing_group_identifier),
 		non_capturing_group_identifier: $ => /\?:/,
 		
 		
 		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
-		$invalid_named_capturing_group: invalidGroupRule($ => $.named_capturing_group_identifier),
 		named_capturing_group_identifier: $ => seq(
 			$._begin_named_capturing_group_identifier,
 			/\?</,
@@ -313,15 +266,10 @@ module.exports = grammar({
 		
 		
 		anonymous_capturing_group: groupRule($ => blank()),
-		$invalid_anonymous_capturing_group: $ => prec.right(seq(
-			alias($.group_begin, $.invalid),
-		)),
 		
 		
-		group_begin: $ => prec(1, /\(/),
-		group_end: $ => prec(1, /\)/),
-		$invalid_group_begin: $ => /\(/,
-		$invalid_group_end: $ => /\)/,
+		group_begin: $ =>/\(/,
+		group_end: $ => /\)/,
 		
 		
 		//#####  boundary assertions  #####
@@ -351,8 +299,8 @@ module.exports = grammar({
 		
 		
 		$character_set: $ => choice(
-			alias($.character_set, $.character_class),				//renamed to match pre-existing themes
-			//alias($._invalid_character_set_delimiter, $.invalid),	// invalid [ ]
+			alias($.character_set, $.character_class),	//renamed to match pre-existing themes
+			alias(/\]/, $.invalid),
 		),
 		
 		character_set: $ => seq(
@@ -369,9 +317,6 @@ module.exports = grammar({
 			),
 			alias(/\]/, $.set_end),
 		),
-		
-		//make sure this is below $.character_set in the code
-		_invalid_character_set_delimiter: $ => /[\[\]]/,
 		
 		
 		//#####  character ranges  #####
