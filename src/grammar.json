@@ -2,30 +2,89 @@
   "name": "regex",
   "rules": {
     "regex": {
+      "type": "SYMBOL",
+      "name": "$regex"
+    },
+    "$regex": {
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "$pattern"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "$disjunction"
-        }
-      ]
-    },
-    "$disjunction": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
+          "type": "SEQ",
           "members": [
             {
               "type": "SYMBOL",
               "name": "$pattern"
             },
             {
-              "type": "BLANK"
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PREC_RIGHT",
+                    "value": 0,
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "disjunction_delimiter"
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "$pattern"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "PREC_RIGHT",
+                "value": 0,
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "disjunction_delimiter"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "$pattern"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "REPEAT1",
+                    "content": {
+                      "type": "PREC_RIGHT",
+                      "value": 0,
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "disjunction_delimiter"
+                      }
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "$pattern"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -35,25 +94,8 @@
             "type": "PREC_RIGHT",
             "value": 0,
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "disjunction_delimiter"
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "$pattern"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "disjunction_delimiter"
             }
           }
         }
@@ -166,15 +208,6 @@
             {
               "type": "SYMBOL",
               "name": "$repeatable_symbol"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "group_end"
-              },
-              "named": true,
-              "value": "invalid"
             },
             {
               "type": "ALIAS",
@@ -701,17 +734,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -719,12 +743,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -748,17 +768,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -791,17 +802,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -809,12 +811,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -838,17 +836,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -881,17 +870,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -899,12 +879,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -928,17 +904,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -971,17 +938,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -989,12 +947,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -1018,17 +972,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1077,17 +1022,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1095,12 +1031,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -1124,17 +1056,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1171,17 +1094,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1189,12 +1103,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -1218,17 +1128,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1305,17 +1206,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -1323,12 +1215,8 @@
                 ]
               },
               {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_end"
-                }
+                "type": "SYMBOL",
+                "name": "group_end"
               }
             ]
           },
@@ -1351,17 +1239,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "$pattern"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "$disjunction"
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "$regex"
                   },
                   {
                     "type": "BLANK"
@@ -2145,6 +2024,9 @@
   "extras": [],
   "conflicts": [
     [
+      "regex"
+    ],
+    [
       "optional"
     ],
     [
@@ -2213,7 +2095,8 @@
     }
   ],
   "inline": [
-    "$disjunction",
+    "$regex",
+    "ReferenceError",
     "$pattern",
     "$symbol_and_quantifier",
     "$repeatable_symbol",

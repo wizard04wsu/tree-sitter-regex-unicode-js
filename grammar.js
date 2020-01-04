@@ -13,19 +13,13 @@ const groupRule = identifier => $ => prec.right(choice(
 	seq(
 		$.group_begin,
 		identifier($),
-		optional(choice(
-			$.$pattern,
-			$.$disjunction,
-		)),
-		prec(1, $.group_end),
+		optional($.$regex),
+		$.group_end,
 	),
 	seq(
 		alias($.group_begin, $.invalid),
 		identifier($),
-		optional(choice(
-			$.$pattern,
-			$.$disjunction,
-		)),
+		optional($.$regex),
 	),
 ));
 
@@ -44,6 +38,8 @@ module.exports = grammar({
 	extras: $ => [],
 	
 	conflicts: $ => [
+		[ $.regex, ],
+		
 		[ $.optional, ],
 		[ $.zero_or_more, ],
 		[ $.one_or_more, ],
@@ -63,6 +59,7 @@ module.exports = grammar({
 	],
 	
 	inline: $ => [
+		$.$regex,
 		$.$disjunction,
 		$.$pattern,
 		
@@ -90,20 +87,26 @@ module.exports = grammar({
 	rules: {
 		
 		
-		regex: $ => choice(
-			$.$pattern,
-			$.$disjunction,
-		),
+		regex: $ => $.$regex,
 		
 		
-		$disjunction: $ => seq(
-			optional($.$pattern),
-			repeat1(
-				prec.right(seq(
-					$.disjunction_delimiter,
-					optional($.$pattern),
+		$regex: $ => choice(
+			seq(
+				$.$pattern,
+				repeat(seq(
+					prec.right($.disjunction_delimiter),
+					$.$pattern,
+				)),
+				repeat(prec.right($.disjunction_delimiter)),
+			),
+			seq(
+				optional($.$pattern),
+				repeat1(seq(
+					repeat1(prec.right($.disjunction_delimiter)),
+					$.$pattern,
 				)),
 			),
+			repeat1(prec.right($.disjunction_delimiter)),
 		),
 		
 		
@@ -129,7 +132,7 @@ module.exports = grammar({
 		$symbol_and_quantifier: $ => seq(
 			choice(
 				$.$repeatable_symbol,
-				alias($.group_end, $.invalid),
+//				alias($.group_end, $.invalid),
 				alias(/[{}]/, $.invalid),
 			),
 			optional($.$quantifier),
