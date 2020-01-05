@@ -8,6 +8,7 @@ enum TokenType {
 	BEGIN_COUNT_QUANTIFIER,
 	BEGIN_UNICODE_CODEPOINT,
 	BEGIN_UNICODE_PROPERTY,
+	END,
 };
 
 void * tree_sitter_regex_external_scanner_create() { return NULL; }
@@ -120,7 +121,11 @@ bool tree_sitter_regex_external_scanner_scan(
 	const bool *valid_symbols
 ) {
 	lexer->mark_end(lexer);
-	if (lexer->lookahead == '\\') {
+	if (lexer->lookahead == 0 && valid_symbols[END]) {
+		lexer->result_symbol = END;
+		return true;
+	}
+	else if (lexer->lookahead == '\\') {
 		advance(lexer);
 		if (valid_symbols[NULL_CHAR] && lexer->lookahead == '0') {
 			advance(lexer);

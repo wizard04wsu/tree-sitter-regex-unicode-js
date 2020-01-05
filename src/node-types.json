@@ -604,16 +604,6 @@
     }
   },
   {
-    "type": "group_begin",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "group_end",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "group_name",
     "named": true,
     "fields": {},
@@ -1827,6 +1817,14 @@
   },
   {
     "type": "escape_operator",
+    "named": true
+  },
+  {
+    "type": "group_begin",
+    "named": true
+  },
+  {
+    "type": "group_end",
     "named": true
   },
   {

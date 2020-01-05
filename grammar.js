@@ -9,11 +9,31 @@ const quantifierRule = quantifier => $ => prec.right(2, seq(
 	)),
 ));
 
-const groupRule = identifier => $ => seq(
+/*const groupRule = identifier => $ => seq(
 	$.group_begin,
 	identifier($),
 	optional($.$pattern_or_disjunction),
 	$.group_end,
+);*/
+const groupRule = identifier => $ => prec.right(choice(
+	seq(
+		$.group_begin,
+		identifier($),
+		optional($.$pattern_or_disjunction),
+		$.group_end,
+	),
+	seq(
+		alias($.group_begin, $.invalid),
+		identifier($),
+		optional($.$pattern_or_disjunction),
+		$._end_of_regex,
+	),
+));
+const unclosedGroupRule = identifier => $ => seq(
+	alias($.group_begin, $.invalid),
+	identifier($),
+	optional($.$pattern_or_disjunction),
+	$._end_of_regex,
 );
 
 module.exports = grammar({
@@ -26,6 +46,7 @@ module.exports = grammar({
 		$._begin_count_quantifier,					// (no content) determines if next token begins a count quantifier   {__}
 		$._begin_unicode_codepoint,					// (no content) determines if next token begins a unicode code point   {__}
 		$._begin_unicode_property,					// (no content) determines if next token begins a unicode property   {__}
+		$._end_of_regex,
 	],
 	
 	extras: $ => [],
@@ -47,7 +68,6 @@ module.exports = grammar({
 		[ $.non_capturing_group, ],
 		[ $.named_capturing_group, ],*/
 		[ $.anonymous_capturing_group, ],
-		[ $.group_begin, $.$top_pattern_or_disjunction_right, ],
 		
 		[ $.character_set, $.character_range, ],
 	],
@@ -98,15 +118,54 @@ module.exports = grammar({
 			),
 			$.$top_pattern_or_disjunction_right,
 		),
+/*		$top_pattern_or_disjunction: $ => choice(
+			seq(
+				$.$top_pattern_or_disjunction_left,
+				optional(choice(
+					seq(
+						$.$pattern_or_disjunction,
+						optional($.$top_pattern_or_disjunction_right),
+					),
+					$.$top_pattern_or_disjunction_right,
+				)),
+			),
+			seq(
+				$.$pattern_or_disjunction,
+				optional($.$top_pattern_or_disjunction_right),
+			),
+			$.$top_pattern_or_disjunction_right,
+		),*/
+/*		$top_pattern_or_disjunction: $ => seq(
+			$.$pattern_or_disjunction,
+			alias(/\)/, $.invalid),
+			$.$pattern_or_disjunction,
+			alias($.$test, $.invalid),
+			//$.$pattern_or_disjunction,
+		),*/
+/*		$top_pattern_or_disjunction: $ => choice(
+			seq(
+				optional($.$top_pattern_or_disjunction_left),
+				$.$pattern_or_disjunction,
+				optional($.$top_pattern_or_disjunction_right),
+			),
+			seq(
+				optional($.$top_pattern_or_disjunction_left),
+				$.$top_pattern_or_disjunction_right,
+			),
+			seq(
+				$.$top_pattern_or_disjunction_left,
+				optional($.$top_pattern_or_disjunction_right),
+			),
+		),*/
 		$top_pattern_or_disjunction_left: $ => prec.right(repeat1(
 			prec.right(seq(
 				$.$pattern_or_disjunction,
-				alias(/\)/, $.invalid),
+				alias($.group_end, $.invalid),
 			)),
 		)),
 		$top_pattern_or_disjunction_right: $ => prec.right(repeat1(
-			prec.right(seq(
-				alias(/\(/, $.invalid),
+			prec.right(1, seq(
+				alias($.group_begin, $.invalid),
 				$.$pattern_or_disjunction,
 			)),
 		)),
@@ -240,6 +299,16 @@ module.exports = grammar({
 			$.anonymous_capturing_group,											// (__)
 		),
 		
+		$unclosed_group_or_lookaround: $ => choice(
+			unclosedGroupRule($ => $.lookahead_identifier)($),
+			unclosedGroupRule($ => $.negative_lookahead_identifier)($),
+			unclosedGroupRule($ => $.lookbehind_identifier)($),
+			unclosedGroupRule($ => $.negative_lookbehind_identifier)($),
+			unclosedGroupRule($ => $.non_capturing_group_identifier)($),
+			unclosedGroupRule($ => $.named_capturing_group_identifier)($),
+			unclosedGroupRule($ => blank())($),
+		),
+		
 		
 		lookahead_assertion: groupRule($ => $.lookahead_identifier),
 		negative_lookahead_assertion: groupRule($ => $.negative_lookahead_identifier),
@@ -295,6 +364,8 @@ module.exports = grammar({
 		
 		
 		group_begin: $ => /\(/,
+//		group_begin: $ => prec(1, /\(/),
+//		group_begin: $ => prec.right(/\(/),
 		group_end: $ => /\)/,
 		
 		
