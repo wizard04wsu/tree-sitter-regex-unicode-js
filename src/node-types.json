@@ -15,6 +15,268 @@
     }
   },
   {
+    "type": "$top_pattern_or_disjunction_left",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "$null_character",
+          "named": true
+        },
+        {
+          "type": "anonymous_capturing_group",
+          "named": true
+        },
+        {
+          "type": "any_character",
+          "named": true
+        },
+        {
+          "type": "boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "character_class",
+          "named": true
+        },
+        {
+          "type": "character_class_escape",
+          "named": true
+        },
+        {
+          "type": "control_letter_escape",
+          "named": true
+        },
+        {
+          "type": "count_quantifier",
+          "named": true
+        },
+        {
+          "type": "disjunction_delimiter",
+          "named": true
+        },
+        {
+          "type": "end_assertion",
+          "named": true
+        },
+        {
+          "type": "hexadecimal_escape",
+          "named": true
+        },
+        {
+          "type": "identity_escape",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
+          "named": true
+        },
+        {
+          "type": "named_capturing_group",
+          "named": true
+        },
+        {
+          "type": "negative_lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "negative_lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "non_boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
+          "named": true
+        },
+        {
+          "type": "one_or_more",
+          "named": true
+        },
+        {
+          "type": "optional",
+          "named": true
+        },
+        {
+          "type": "special_escape",
+          "named": true
+        },
+        {
+          "type": "start_assertion",
+          "named": true
+        },
+        {
+          "type": "unicode_codepoint_escape",
+          "named": true
+        },
+        {
+          "type": "unicode_escape",
+          "named": true
+        },
+        {
+          "type": "zero_or_more",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "$top_pattern_or_disjunction_right",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "$null_character",
+          "named": true
+        },
+        {
+          "type": "anonymous_capturing_group",
+          "named": true
+        },
+        {
+          "type": "any_character",
+          "named": true
+        },
+        {
+          "type": "boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "character_class",
+          "named": true
+        },
+        {
+          "type": "character_class_escape",
+          "named": true
+        },
+        {
+          "type": "control_letter_escape",
+          "named": true
+        },
+        {
+          "type": "count_quantifier",
+          "named": true
+        },
+        {
+          "type": "disjunction_delimiter",
+          "named": true
+        },
+        {
+          "type": "end_assertion",
+          "named": true
+        },
+        {
+          "type": "hexadecimal_escape",
+          "named": true
+        },
+        {
+          "type": "identity_escape",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "named_backreference",
+          "named": true
+        },
+        {
+          "type": "named_capturing_group",
+          "named": true
+        },
+        {
+          "type": "negative_lookahead_assertion",
+          "named": true
+        },
+        {
+          "type": "negative_lookbehind_assertion",
+          "named": true
+        },
+        {
+          "type": "non_boundary_assertion",
+          "named": true
+        },
+        {
+          "type": "non_capturing_group",
+          "named": true
+        },
+        {
+          "type": "non_syntax",
+          "named": true
+        },
+        {
+          "type": "numeric_backreference",
+          "named": true
+        },
+        {
+          "type": "one_or_more",
+          "named": true
+        },
+        {
+          "type": "optional",
+          "named": true
+        },
+        {
+          "type": "special_escape",
+          "named": true
+        },
+        {
+          "type": "start_assertion",
+          "named": true
+        },
+        {
+          "type": "unicode_codepoint_escape",
+          "named": true
+        },
+        {
+          "type": "unicode_escape",
+          "named": true
+        },
+        {
+          "type": "zero_or_more",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "anonymous_capturing_group",
     "named": true,
     "fields": {},
@@ -1347,10 +1609,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "$null_character",
+          "named": true
+        },
+        {
+          "type": "$top_pattern_or_disjunction_left",
+          "named": true
+        },
+        {
+          "type": "$top_pattern_or_disjunction_right",
           "named": true
         },
         {
