@@ -206,17 +206,30 @@
             {
               "type": "REPEAT1",
               "content": {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$boundary_assertion"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "$top_symbol_and_quantifier"
-                  }
-                ]
+                "type": "PREC_RIGHT",
+                "value": 0,
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "$boundary_assertion"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "$top_symbol_and_quantifier"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "\\("
+                      },
+                      "named": true,
+                      "value": "invalid"
+                    }
+                  ]
+                }
               }
             }
           ]
@@ -956,36 +969,6 @@
                 "name": "group_end"
               }
             ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "lookahead_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              }
-            ]
           }
         ]
       }
@@ -1022,36 +1005,6 @@
               {
                 "type": "SYMBOL",
                 "name": "group_end"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "negative_lookahead_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
               }
             ]
           }
@@ -1092,36 +1045,6 @@
                 "name": "group_end"
               }
             ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "lookbehind_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              }
-            ]
           }
         ]
       }
@@ -1158,36 +1081,6 @@
               {
                 "type": "SYMBOL",
                 "name": "group_end"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "negative_lookbehind_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
               }
             ]
           }
@@ -1244,36 +1137,6 @@
                 "name": "group_end"
               }
             ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "non_capturing_group_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              }
-            ]
           }
         ]
       }
@@ -1314,36 +1177,6 @@
               {
                 "type": "SYMBOL",
                 "name": "group_end"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "named_capturing_group_identifier"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
               }
             ]
           }
@@ -1426,35 +1259,6 @@
               {
                 "type": "SYMBOL",
                 "name": "group_end"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "group_begin"
-                },
-                "named": true,
-                "value": "invalid"
-              },
-              {
-                "type": "BLANK"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "$pattern_or_disjunction"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
               }
             ]
           }
@@ -2252,25 +2056,11 @@
       "$invalid_named_backreference"
     ],
     [
-      "lookahead_assertion"
-    ],
-    [
-      "negative_lookahead_assertion"
-    ],
-    [
-      "lookbehind_assertion"
-    ],
-    [
-      "negative_lookbehind_assertion"
-    ],
-    [
-      "non_capturing_group"
-    ],
-    [
-      "named_capturing_group"
-    ],
-    [
       "anonymous_capturing_group"
+    ],
+    [
+      "regex",
+      "group_begin"
     ],
     [
       "character_set",

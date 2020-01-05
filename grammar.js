@@ -16,11 +16,6 @@ const groupRule = identifier => $ => prec.right(choice(
 		optional($.$pattern_or_disjunction),
 		$.group_end,
 	),
-	seq(
-		alias($.group_begin, $.invalid),
-		identifier($),
-		optional($.$pattern_or_disjunction),
-	),
 ));
 
 module.exports = grammar({
@@ -47,13 +42,15 @@ module.exports = grammar({
 		
 		[ $.named_backreference, $.$invalid_named_backreference, ],
 		
-		[ $.lookahead_assertion, ],
+		/*[ $.lookahead_assertion, ],
 		[ $.negative_lookahead_assertion, ],
 		[ $.lookbehind_assertion, ],
 		[ $.negative_lookbehind_assertion, ],
 		[ $.non_capturing_group, ],
-		[ $.named_capturing_group, ],
+		[ $.named_capturing_group, ],*/
 		[ $.anonymous_capturing_group, ],
+		//[ $.group_end, ],
+		[ $.regex, $.group_begin, ],
 		
 		[ $.character_set, $.character_range, ],
 	],
@@ -135,10 +132,12 @@ module.exports = grammar({
 				repeat(alias(/[?*+]/, $.invalid)),
 				optional(alias(/\{/, $.invalid)),
 				repeat1(
-					choice(
+					prec.right(choice(
 						$.$boundary_assertion,
 						$.$top_symbol_and_quantifier,
-					),
+//						alias($.group_begin, $.invalid),
+						alias(/\(/, $.invalid),
+					)),
 				),
 			),
 			seq(
