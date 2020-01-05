@@ -3,9 +3,92 @@
   "rules": {
     "regex": {
       "type": "SYMBOL",
-      "name": "$regex"
+      "name": "$top_pattern_or_disjunction"
     },
-    "$regex": {
+    "$top_pattern_or_disjunction": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "$top_pattern"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "REPEAT1",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "disjunction_delimiter"
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "$top_pattern"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "disjunction_delimiter"
+              }
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "$top_pattern"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "REPEAT1",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "disjunction_delimiter"
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "$top_pattern"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "disjunction_delimiter"
+          }
+        }
+      ]
+    },
+    "$pattern_or_disjunction": {
       "type": "CHOICE",
       "members": [
         {
@@ -21,12 +104,8 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "PREC_RIGHT",
-                    "value": 0,
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "disjunction_delimiter"
-                    }
+                    "type": "SYMBOL",
+                    "name": "disjunction_delimiter"
                   },
                   {
                     "type": "SYMBOL",
@@ -38,12 +117,8 @@
             {
               "type": "REPEAT",
               "content": {
-                "type": "PREC_RIGHT",
-                "value": 0,
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "disjunction_delimiter"
-                }
+                "type": "SYMBOL",
+                "name": "disjunction_delimiter"
               }
             }
           ]
@@ -71,12 +146,8 @@
                   {
                     "type": "REPEAT1",
                     "content": {
-                      "type": "PREC_RIGHT",
-                      "value": 0,
-                      "content": {
-                        "type": "SYMBOL",
-                        "name": "disjunction_delimiter"
-                      }
+                      "type": "SYMBOL",
+                      "name": "disjunction_delimiter"
                     }
                   },
                   {
@@ -91,13 +162,107 @@
         {
           "type": "REPEAT1",
           "content": {
-            "type": "PREC_RIGHT",
-            "value": 0,
-            "content": {
-              "type": "SYMBOL",
-              "name": "disjunction_delimiter"
-            }
+            "type": "SYMBOL",
+            "name": "disjunction_delimiter"
           }
+        }
+      ]
+    },
+    "$top_pattern": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "[?*+]"
+                },
+                "named": true,
+                "value": "invalid"
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "\\{"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "$boundary_assertion"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "$top_symbol_and_quantifier"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "[?*+]"
+                },
+                "named": true,
+                "value": "invalid"
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "\\{"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "PATTERN",
+            "value": "\\{"
+          },
+          "named": true,
+          "value": "invalid"
         }
       ]
     },
@@ -196,6 +361,50 @@
           },
           "named": true,
           "value": "invalid"
+        }
+      ]
+    },
+    "$top_symbol_and_quantifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "$repeatable_symbol"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "PATTERN",
+                "value": "[{}]"
+              },
+              "named": true,
+              "value": "invalid"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "PATTERN",
+                "value": "\\)"
+              },
+              "named": true,
+              "value": "invalid"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "$quantifier"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -735,7 +944,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -769,7 +978,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -803,7 +1012,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -837,7 +1046,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -871,7 +1080,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -905,7 +1114,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -939,7 +1148,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -973,7 +1182,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1023,7 +1232,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1057,7 +1266,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1095,7 +1304,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1129,7 +1338,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1207,7 +1416,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -1240,7 +1449,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "$regex"
+                    "name": "$pattern_or_disjunction"
                   },
                   {
                     "type": "BLANK"
@@ -2095,9 +2304,11 @@
     }
   ],
   "inline": [
-    "$regex",
-    "ReferenceError",
+    "$top_pattern_or_disjunction",
+    "$pattern_or_disjunction",
+    "$top_pattern",
     "$pattern",
+    "$top_symbol_and_quantifier",
     "$symbol_and_quantifier",
     "$repeatable_symbol",
     "$quantifier",
