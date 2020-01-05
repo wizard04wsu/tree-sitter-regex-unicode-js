@@ -111,7 +111,32 @@ static bool checkForUnicodeCodePoint(TSLexer *lexer) {
 	return false;
 }
 static bool checkForUnicodeProperty(TSLexer *lexer) {
-	//TODO
+	char chars[] = "_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	bool nameFound = false;
+	if (lexer->lookahead == 0 || strchr(chars, lexer->lookahead) == NULL) {
+		return false;
+	}
+	while (lexer->lookahead != 0 && strchr(chars, lexer->lookahead) != NULL) {
+		advance(lexer);
+		nameFound = true;
+	}
+	if (!nameFound) {
+		return false;
+	}
+	if (lexer->lookahead == '=') {
+		advance(lexer);
+		nameFound = false;
+		while (lexer->lookahead != 0 && strchr(chars, lexer->lookahead) != NULL) {
+			advance(lexer);
+			nameFound = true;
+		}
+		if (!nameFound) {
+			return false;
+		}
+	}
+	if (lexer->lookahead == '}') {
+		return true;
+	}
 	return false;
 }
 

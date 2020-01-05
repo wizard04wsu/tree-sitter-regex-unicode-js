@@ -254,7 +254,7 @@ module.exports = grammar({
 		//TODO: Tree-sitter doesn't support Unicode property escapes, so I can't reasonably make this match the spec.
 		// https://tc39.es/proposal-regexp-named-groups/
 		// http://www.unicode.org/reports/tr31/#Table_Lexical_Classes_for_Identifiers
-		/*group_name: $ => seq(
+		/*group_name: $ => prec.right(seq(
 			choice(
 				/[\p{ID_Start}$_]/,
 				$.unicode_escape,
@@ -267,7 +267,7 @@ module.exports = grammar({
 					$.unicode_codepoint_escape,
 				)
 			),
-		),*/
+		)),*/
 		group_name: $ => prec.right(repeat1(
 			choice(
 				/[a-zA-Z0-9$_]/,
@@ -321,8 +321,8 @@ module.exports = grammar({
 			repeat(
 				choice(
 					$.character_range,									// __-__
-					$.character_class_escape,							// \d \D \s \S \w \W
-					$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \0
+					$.character_class_escape,							// \d \D \s \S \w \W \p{__} \P{__} \p{__=__} \P{__=__}
+					$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \u{__} \0
 					alias($._dash, $.non_syntax),						// -
 					alias($._s_non_syntax_character, $.non_syntax),		// NOT: - \ ] or newline
 				),
@@ -341,7 +341,7 @@ module.exports = grammar({
 		)),
 		
 		$character_range_unit: $ => choice(
-			$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \0
+			$.$s_character_escape,								// \f \n \r \t \v \b \c__ \x__ \u__ \u{__} \0
 			alias($._dash, $.non_syntax),						// -
 			alias($._s_non_syntax_character, $.non_syntax),		// NOT: - \ ] or newline
 		),
@@ -357,7 +357,9 @@ module.exports = grammar({
 			),
 			seq(
 				$._backslash,
-				/[pP]\{/,
+				/[pP]/,
+				$._begin_unicode_property,	// (no content)
+				/\{/,
 				choice(
 					alias(/[a-zA-Z_0-9]+/, $.unicode_property_value),
 					seq(
@@ -370,7 +372,7 @@ module.exports = grammar({
 			),
 		),
 		$invalid_character_class_escape: $ => seq(
-			alias($._backslash, $.escape_operator),
+			$._backslash,
 			/[pP]/,
 		),
 		
@@ -391,6 +393,7 @@ module.exports = grammar({
 			alias($.$invalid_hexadecimal_escape, $.invalid),
 			alias($.$invalid_unicode_escape, $.invalid),
 			alias($.$p_invalid_identity_escape, $.invalid),
+			alias($.$invalid_character_class_escape, $.invalid),
 		)),
 		$s_character_escape: $ => choice(
 			$.$null_character,
@@ -405,6 +408,7 @@ module.exports = grammar({
 			alias($.$invalid_hexadecimal_escape, $.invalid),
 			alias($.$invalid_unicode_escape, $.invalid),
 			alias($.$s_invalid_identity_escape, $.invalid),
+			alias($.$invalid_character_class_escape, $.invalid),
 		),
 		
 		

@@ -1564,7 +1564,15 @@
             },
             {
               "type": "PATTERN",
-              "value": "[pP]\\{"
+              "value": "[pP]"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_begin_unicode_property"
+            },
+            {
+              "type": "PATTERN",
+              "value": "\\{"
             },
             {
               "type": "CHOICE",
@@ -1624,13 +1632,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_backslash"
-          },
-          "named": true,
-          "value": "escape_operator"
+          "type": "SYMBOL",
+          "name": "_backslash"
         },
         {
           "type": "PATTERN",
@@ -1726,6 +1729,15 @@
             },
             "named": true,
             "value": "invalid"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "$invalid_character_class_escape"
+            },
+            "named": true,
+            "value": "invalid"
           }
         ]
       }
@@ -1812,6 +1824,15 @@
           "content": {
             "type": "SYMBOL",
             "name": "$s_invalid_identity_escape"
+          },
+          "named": true,
+          "value": "invalid"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "$invalid_character_class_escape"
           },
           "named": true,
           "value": "invalid"
