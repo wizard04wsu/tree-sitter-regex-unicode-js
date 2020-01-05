@@ -104,7 +104,7 @@
         "type": "REPEAT1",
         "content": {
           "type": "PREC_RIGHT",
-          "value": 1,
+          "value": 0,
           "content": {
             "type": "SEQ",
             "members": [
