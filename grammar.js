@@ -34,7 +34,7 @@ module.exports = grammar({
 		$._begin_count_quantifier,					// (no content) determines if next token begins a count quantifier   {__}
 		$._begin_unicode_codepoint,					// (no content) determines if next token begins a unicode code point   {__}
 		$._begin_unicode_property,					// (no content) determines if next token begins a unicode property   {__}
-		$._end_of_regex,
+		$._end_of_regex,							// (no content) determines if there are no more tokens
 	],
 	
 	extras: $ => [],
@@ -55,12 +55,9 @@ module.exports = grammar({
 	],
 	
 	inline: $ => [
-		$.$top_pattern_or_disjunction,
 		$.$pattern_or_disjunction,
-		$.$top_pattern,
 		$.$pattern,
 		
-		$.$top_symbol_and_quantifier,
 		$.$symbol_and_quantifier,
 		$.$repeatable_symbol,
 		
@@ -85,33 +82,18 @@ module.exports = grammar({
 	rules: {
 		
 		
-		regex: $ => $.$top_pattern_or_disjunction,
-		
-		
-		$top_pattern_or_disjunction: $ => choice(
+		regex: $ => choice(
 			seq(
-				optional($.$top_pattern_or_disjunction_left),
-				$.$pattern_or_disjunction,
-				optional($.$top_pattern_or_disjunction_right),
+				prec.right(repeat1(
+					prec.right(seq(
+						$.$pattern_or_disjunction,
+						alias($.group_end, $.invalid),
+					)),
+				)),
+				optional($.$pattern_or_disjunction),
 			),
-			seq(
-				$.$top_pattern_or_disjunction_left,
-				optional($.$top_pattern_or_disjunction_right),
-			),
-			$.$top_pattern_or_disjunction_right,
+			$.$pattern_or_disjunction,
 		),
-		$top_pattern_or_disjunction_left: $ => prec.right(repeat1(
-			prec.right(seq(
-				$.$pattern_or_disjunction,
-				alias($.group_end, $.invalid),
-			)),
-		)),
-		$top_pattern_or_disjunction_right: $ => prec.right(repeat1(
-			prec.right(seq(
-				alias($.group_begin, $.invalid),
-				$.$pattern_or_disjunction,
-			)),
-		)),
 		
 		
 		$pattern_or_disjunction: $ => choice(
