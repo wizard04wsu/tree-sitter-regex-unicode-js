@@ -1,6 +1,6 @@
 {
 	"name": "tree-sitter-regex-unicode-js",
-	"version": "1.0.2",
+	"version": "2.0.0",
 	"description": "JavaScript regular expression grammar for Unicode patterns",
 	"main": "index.js",
 	"repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
