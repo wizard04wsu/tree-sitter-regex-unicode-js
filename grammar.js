@@ -244,7 +244,7 @@ module.exports = grammar({
 		
 		named_capturing_group: groupRule($ => $.named_capturing_group_identifier),
 		named_capturing_group_identifier: $ => seq(
-			$._begin_named_capturing_group_identifier,
+			$._begin_named_capturing_group_identifier,  // (no content)
 			/\?</,
 			$.group_name,
 			/>/,
