@@ -1,6 +1,7 @@
 node_modules
 .node-version
 build
+test
 *.log
 /test.js
 /examples/npm
