@@ -1,19 +1,22 @@
 {
 	"name": "tree-sitter-regex-unicode-js",
 	"version": "2.0.1",
-	"description": "JavaScript regular expression grammar for Unicode patterns",
-	"main": "index.js",
+	"description": "JavaScript regular expression parser for Unicode patterns",
 	"repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
 	"keywords": [
 		"javascript",
 		"regex",
+		"regexp",
 		"unicode",
-		"parser"
+		"parser",
+		"grammar"
 	],
 	"author": "Andy Harrison",
 	"license": "MIT",
+	"main": "index.js",
 	"devDependencies": {
-		"tree-sitter-cli": "^0.20.0"
+		"electron-rebuild": "^3.2.7",
+		"tree-sitter-cli": "^0.15.14"
 	},
 	"dependencies": {
 		"nan": "^2.15.0"
