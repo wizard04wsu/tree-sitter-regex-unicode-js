@@ -1,14 +1,15 @@
 {
   "targets": [
     {
-      "target_name": "tree_sitter_regex_binding",
+      "target_name": "tree_sitter_regex_unicode_js_binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"
       ],
       "sources": [
+        "bindings/node/binding.cc",
         "src/parser.c",
-        "src/binding.cc",
+        # If your language uses an external scanner, add it here.
         "src/scanner.c"
       ],
       "cflags_c": [
