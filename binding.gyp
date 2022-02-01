@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "ts_binding",
+      "target_name": "ts_regex_u_js_binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"
