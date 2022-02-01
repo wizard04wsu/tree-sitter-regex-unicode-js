@@ -11,10 +11,10 @@ enum TokenType {
 	END,
 };
 
-void * ts_external_scanner_create() { return NULL; }
-void ts_external_scanner_destroy(void *payload) {}
-unsigned ts_external_scanner_serialize(void *payload, char *buffer) { return 0; }
-void ts_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
+void * ts_regex_u_js_external_scanner_create() { return NULL; }
+void ts_regex_u_js_external_scanner_destroy(void *payload) {}
+unsigned ts_regex_u_js_external_scanner_serialize(void *payload, char *buffer) { return 0; }
+void ts_regex_u_js_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
 
 static void advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
@@ -140,7 +140,7 @@ static bool checkForUnicodeProperty(TSLexer *lexer) {
 	return false;
 }
 
-bool ts_external_scanner_scan(
+bool ts_regex_u_js_external_scanner_scan(
 	void *payload,
 	TSLexer *lexer,
 	const bool *valid_symbols

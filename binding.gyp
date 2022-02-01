@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "ts_binding",
+      "target_name": "ts_regex_u_js_binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"
@@ -10,7 +10,6 @@
         "bindings/node/binding.cc",
         "src/parser.c",
         # If your language uses an external scanner, add it here.
-        "src/scanner.c"
       ],
       "cflags_c": [
         "-std=c99",

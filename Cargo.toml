@@ -12,7 +12,7 @@ keywords = [
   "grammar"
 ]
 categories = ["parsing", "text-editors"]
-repository = "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js"
+repository = "https://github.com/wizard04wsu/ts-regex-u-js"
 edition = "2018"
 license = "MIT"
 
