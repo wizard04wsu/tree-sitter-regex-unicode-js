@@ -1,5 +1,5 @@
 [package]
-name = "tree-sitter-regex-unicode-js"
+name = "ts-regex-u-js"
 description = "Tree-sitter parser for JavaScript regular expression (Unicode patterns)"
 version = "2.0.3"
 keywords = [

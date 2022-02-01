@@ -1,6 +1,6 @@
 {
-  "name": "tree-sitter-regex-unicode-js",
-  "version": "2.0.6",
+  "name": "ts-regex-u-js",
+  "version": "2.0.7",
   "description": "Tree-sitter parser for JavaScript regular expression (Unicode patterns)",
   "repository": "https://github.com/wizard04wsu/ts-regex-u-js",
   "keywords": [
