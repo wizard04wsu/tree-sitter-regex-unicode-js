@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "tree_sitter_regex_u_js_binding",
+      "target_name": "tree_sitter___binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"
