@@ -6,7 +6,7 @@
 //! ```
 //! let code = "";
 //! let mut parser = tree_sitter::Parser::new();
-//! parser.set_language(ts_regex_u_js::language()).expect("Error loading regex_unicode_js grammar");
+//! parser.set_language(tree_sitter_regex_u_js::language()).expect("Error loading regex_unicode_js grammar");
 //! let tree = parser.parse(code, None).unwrap();
 //! ```
 //!
@@ -18,14 +18,14 @@
 use tree_sitter::Language;
 
 extern "C" {
-    fn ts_regex_u_js() -> Language;
+    fn tree_sitter_regex_u_js() -> Language;
 }
 
 /// Get the tree-sitter [Language][] for this grammar.
 ///
 /// [Language]: https://docs.rs/tree-sitter/*/tree_sitter/struct.Language.html
 pub fn language() -> Language {
-    unsafe { ts_regex_u_js() }
+    unsafe { tree_sitter_regex_u_js() }
 }
 
 /// The content of the [`node-types.json`][] file for this grammar.

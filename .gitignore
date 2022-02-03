@@ -4,3 +4,5 @@
 /test/
 /package-lock.json
 *.log
+/parser.*
+/scanner.*

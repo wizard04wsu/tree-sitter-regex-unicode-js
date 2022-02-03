@@ -1,5 +1,5 @@
 {
-  "name": "regex_unicode_js",
+  "name": "regex_u_js",
   "rules": {
     "regex": {
       "type": "CHOICE",
