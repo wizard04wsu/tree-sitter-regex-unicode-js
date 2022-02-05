@@ -1,5 +1,5 @@
 {
-  "name": "_",
+  "name": "regex_u",
   "rules": {
     "regex": {
       "type": "CHOICE",

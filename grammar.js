@@ -25,7 +25,7 @@ const groupRule = identifier => $ => prec.right(choice(
 ));
 
 module.exports = grammar({
-	name: '_',
+	name: 'regex_u',
 	
 	externals: $ => [
 		$.null_character,							// \0  (not followed by 0-9)

@@ -1,7 +1,7 @@
 [package]
 name = "tree-sitter-regex-unicode-js"
 description = "Tree-sitter parser for JavaScript regular expression (Unicode patterns)"
-version = "2.0.3"
+version = "2.0.12"
 keywords = [
   "javascript",
   "regex",

@@ -1,7 +1,7 @@
 {
   "name": "tree-sitter-regex-unicode-js",
-  "version": "2.0.11",
-  "description": "Tree-sitter parser for JavaScript regular expression (Unicode patterns)",
+  "version": "2.0.12",
+  "description": "Tree-sitter parser for JavaScript regular expressions (Unicode patterns)",
   "repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
   "keywords": [
     "javascript",
