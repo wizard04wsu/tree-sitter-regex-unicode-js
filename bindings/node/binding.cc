@@ -4,7 +4,7 @@
 
 using namespace v8;
 
-extern "C" TSLanguage * tree_sitter__();
+extern "C" TSLanguage * tree_sitter_regex_u();
 
 namespace {
 
@@ -17,12 +17,12 @@ void Init(Local<Object> exports, Local<Object> module) {
 
   Local<Function> constructor = Nan::GetFunction(tpl).ToLocalChecked();
   Local<Object> instance = constructor->NewInstance(Nan::GetCurrentContext()).ToLocalChecked();
-  Nan::SetInternalFieldPointer(instance, 0, tree_sitter__());
+  Nan::SetInternalFieldPointer(instance, 0, tree_sitter_regex_u());
 
-  Nan::Set(instance, Nan::New("name").ToLocalChecked(), Nan::New("_").ToLocalChecked());
+  Nan::Set(instance, Nan::New("name").ToLocalChecked(), Nan::New("regex_u").ToLocalChecked());
   Nan::Set(module, Nan::New("exports").ToLocalChecked(), instance);
 }
 
-NODE_MODULE(tree_sitter___binding, Init)
+NODE_MODULE(tree_sitter_regex_u_binding, Init)
 
 }  // namespace
