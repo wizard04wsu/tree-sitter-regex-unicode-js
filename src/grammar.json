@@ -2141,7 +2141,6 @@
       "character_range"
     ]
   ],
-  "precedences": [],
   "externals": [
     {
       "type": "SYMBOL",
