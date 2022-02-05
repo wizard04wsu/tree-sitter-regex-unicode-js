@@ -1590,10 +1590,6 @@
     "named": true
   },
   {
-    "type": "null_character",
-    "named": true
-  },
-  {
     "type": "range_delimiter",
     "named": true
   },

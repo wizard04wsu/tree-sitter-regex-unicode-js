@@ -1,5 +1,5 @@
 {
-  "name": "regex_unicode_js",
+  "name": "regex_u",
   "rules": {
     "regex": {
       "type": "CHOICE",
@@ -2141,7 +2141,6 @@
       "character_range"
     ]
   ],
-  "precedences": [],
   "externals": [
     {
       "type": "SYMBOL",

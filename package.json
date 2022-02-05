@@ -1,7 +1,7 @@
 {
   "name": "tree-sitter-regex-unicode-js",
-  "version": "2.0.9",
-  "description": "Tree-sitter parser for JavaScript regular expression (Unicode patterns)",
+  "version": "2.0.16",
+  "description": "Tree-sitter parser for JavaScript regular expressions (Unicode patterns)",
   "repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
   "keywords": [
     "javascript",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "main": "bindings/node",
   "devDependencies": {
-    "tree-sitter-cli": "^0.20.4"
+    "tree-sitter-cli": "^0.15.14"
   },
   "dependencies": {
     "nan": "^2.15.0"
