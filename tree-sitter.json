@@ -1,0 +1,41 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "regex_unicode_js",
+      "camelcase": "RegexUnicodeJS",
+      "title": "JavaScript Regular Expressions (Unicode)",
+      "scope": "source.regex_unicode_js",
+      "file-types": [
+        "regex_js"
+      ],
+      "injection-regex": "^regex_unicode_js$",
+      "class-name": "TreeSitterRegexUnicodeJs"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for JavaScript regular expressions with the Unicode flag set",
+    "authors": [
+      {
+        "name": "Andy Harrison",
+        "url": ""
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/wizard04wsu/tree-sitter-regex-unicode-js",
+      "funding": ""
+    }
+  },
+  "bindings": {
+    "c": false,
+    "go": false,
+    "java": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false,
+    "zig": false
+  }
+}
