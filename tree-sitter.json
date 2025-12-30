@@ -5,11 +5,11 @@
       "name": "regex_unicode_js",
       "camelcase": "RegexUnicodeJS",
       "title": "JavaScript Regular Expressions (Unicode)",
-      "scope": "source.regex_unicode_js",
+      "scope": "source.regex-unicode-js",
       "file-types": [
         "regex_js"
       ],
-      "injection-regex": "^regex_unicode_js$",
+      "injection-regex": "^regex[_-]unicode[_-]js$",
       "class-name": "TreeSitterRegexUnicodeJs"
     }
   ],

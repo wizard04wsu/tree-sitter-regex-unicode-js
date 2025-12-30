@@ -62,25 +62,25 @@ Unicode escapes
 		(unicode_escape
 			(unicode_code))
 		(set_end))
-	(unicode_escape
+	(unicode_codepoint_escape
 		(unicode_code))
 	(character_class
 		(set_begin)
-		(unicode_escape
+		(unicode_codepoint_escape
 			(unicode_code))
 		(set_end))
-	(unicode_escape
+	(unicode_codepoint_escape
 		(unicode_code))
 	(character_class
 		(set_begin)
-		(unicode_escape
+		(unicode_codepoint_escape
 			(unicode_code))
 		(set_end))
-	(unicode_escape
+	(unicode_codepoint_escape
 		(unicode_code))
 	(character_class
 		(set_begin)
-		(unicode_escape
+		(unicode_codepoint_escape
 			(unicode_code))
 		(set_end)))
 
@@ -218,4 +218,3 @@ Unicode property escapes
 			(unicode_property_operator)
 			(unicode_property_value))
 		(set_end)))
-

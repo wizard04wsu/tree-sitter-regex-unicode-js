@@ -308,10 +308,10 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "_p_non_syntax_character"
+            "name": "_p_character"
           },
           "named": true,
-          "value": "non_syntax"
+          "value": "character"
         }
       ]
     },
@@ -1462,16 +1462,16 @@
                   "name": "_dash"
                 },
                 "named": true,
-                "value": "non_syntax"
+                "value": "character"
               },
               {
                 "type": "ALIAS",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "_s_non_syntax_character"
+                  "name": "_s_character"
                 },
                 "named": true,
-                "value": "non_syntax"
+                "value": "character"
               }
             ]
           }
@@ -1527,16 +1527,16 @@
             "name": "_dash"
           },
           "named": true,
-          "value": "non_syntax"
+          "value": "character"
         },
         {
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "_s_non_syntax_character"
+            "name": "_s_character"
           },
           "named": true,
-          "value": "non_syntax"
+          "value": "character"
         }
       ]
     },
@@ -1649,8 +1649,13 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "$null_character"
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "$null_character"
+            },
+            "named": true,
+            "value": "null_character"
           },
           {
             "type": "ALIAS",
@@ -1747,8 +1752,13 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "$null_character"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "$null_character"
+          },
+          "named": true,
+          "value": "null_character"
         },
         {
           "type": "ALIAS",
@@ -1845,7 +1855,7 @@
       "value": 1,
       "content": {
         "type": "SYMBOL",
-        "name": "null_character"
+        "name": "_null_character"
       }
     },
     "$invalid_null_character": {
@@ -2104,39 +2114,17 @@
       "type": "PATTERN",
       "value": "\\."
     },
-    "_p_non_syntax_character": {
+    "_p_character": {
       "type": "PATTERN",
       "value": "[^\\^$\\\\.*+?()\\[\\]{}|\\/\\n]"
     },
-    "_s_non_syntax_character": {
+    "_s_character": {
       "type": "PATTERN",
       "value": "[^-\\\\\\]\\n]"
     }
   },
   "extras": [],
   "conflicts": [
-    [
-      "regex"
-    ],
-    [
-      "optional"
-    ],
-    [
-      "zero_or_more"
-    ],
-    [
-      "one_or_more"
-    ],
-    [
-      "count_quantifier"
-    ],
-    [
-      "named_backreference",
-      "$invalid_named_backreference"
-    ],
-    [
-      "anonymous_capturing_group"
-    ],
     [
       "character_set",
       "character_range"
@@ -2146,7 +2134,7 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "null_character"
+      "name": "_null_character"
     },
     {
       "type": "SYMBOL",

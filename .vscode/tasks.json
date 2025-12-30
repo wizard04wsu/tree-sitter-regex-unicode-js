@@ -1,0 +1,33 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install Tree-sitter CLI",
+			"type": "shell",
+			"command": "npm install tree-sitter-cli@latest",
+			"detail": "Install or update the Tree-sitter CLI using npm."
+		},
+		{
+			"label": "Generate the parser",
+			"type": "shell",
+      "command": "npx tree-sitter generate",
+			"group": "build",
+			"detail": "Generate a Tree-sitter parser based on the grammar."
+		},
+		{
+			"label": "Run unit tests",
+			"type": "shell",
+      "command": "npx tree-sitter test",
+			"detail": "Run the unit tests for the Tree-sitter parser."
+		},
+		{
+			"label": "Generate the parser & build as WASM",
+			"type": "shell",
+      "command": "npx tree-sitter generate && npx tree-sitter build --wasm -o out/tree-sitter-regex-unicode-js.wasm",
+			"group": "build",
+			"detail": "Generate a Tree-sitter parser based on the grammar."
+		}
+	]
+}
