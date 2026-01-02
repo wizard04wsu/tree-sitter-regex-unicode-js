@@ -9,13 +9,13 @@
 			"command": "npm install tree-sitter-cli@latest",
 			"detail": "Install or update the Tree-sitter CLI using npm."
 		},
-		{
+		/*{
 			"label": "Generate the parser",
 			"type": "shell",
       "command": "npx tree-sitter generate",
 			"group": "build",
 			"detail": "Generate a Tree-sitter parser based on the grammar."
-		},
+		},*/
 		{
 			"label": "Run unit tests",
 			"type": "shell",
@@ -23,7 +23,7 @@
 			"detail": "Run the unit tests for the Tree-sitter parser."
 		},
 		{
-			"label": "Generate the parser & build as WASM",
+			"label": "Generate parser, build WASM",
 			"type": "shell",
       "command": "npx tree-sitter generate && npx tree-sitter build --wasm -o out/tree-sitter-regex-unicode-js.wasm",
 			"group": "build",
